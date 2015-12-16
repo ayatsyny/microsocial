@@ -27,3 +27,9 @@ class Person(models.Model):
 
     def __unicode__(self):
         return u'{} {}'.format(self.first_name, self.last_name)
+
+
+class Message(models.Model):
+    person = models.ForeignKey(Person, verbose_name=u'пользователь', related_name='persons')
+    created = models.DateTimeField(verbose_name=u'дата создания', auto_now_add=True)
+    body = models.TextField(verbose_name=u'сообщение', max_length=600, blank=True)
