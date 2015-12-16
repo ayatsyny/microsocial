@@ -17,6 +17,8 @@ class Person(models.Model):
     work_place = models.CharField(verbose_name=u'место работы', max_length=120, blank=True)
     info_yourself = models.TextField(verbose_name=u'о себе', max_length=500, blank=True)
     interests = models.TextField(verbose_name=u'интересы', max_length=400, blank=True)
+    image = models.ImageField(default='img_default/avatar.jpg', upload_to='img')
+    friends = models.ManyToManyField('self', symmetrical=True)
 
     class Meta:
         verbose_name = u'контактное лицо'
@@ -25,5 +27,3 @@ class Person(models.Model):
 
     def __unicode__(self):
         return u'{} {}'.format(self.first_name, self.last_name)
-
-
