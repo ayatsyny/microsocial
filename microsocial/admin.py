@@ -1,12 +1,13 @@
 # coding=utf-8
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from microsocial.forms import UserCreationForm, UserChangeForm
 from microsocial.models import User
 
 
 class CustomUserAdmin(UserAdmin):
-    form = UserChangeFrom
-    add_form = UserCreationFrom
+    form = UserChangeForm
+    add_form = UserCreationForm
     list_display = ('email', 'name', 'is_staff')
     add_fieldsets = (
         (None, {
