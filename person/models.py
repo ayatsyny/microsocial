@@ -1,5 +1,6 @@
 # coding=utf-8
 from django.db import models
+from microsocial import settings
 
 
 class Person(models.Model):
@@ -19,6 +20,7 @@ class Person(models.Model):
     interests = models.TextField(verbose_name=u'интересы', max_length=400, blank=True)
     image = models.ImageField(default='img_default/avatar.jpg', upload_to='img')
     friends = models.ManyToManyField('self', symmetrical=True)
+    login_id = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='login')
 
     class Meta:
         verbose_name = u'контактное лицо'
