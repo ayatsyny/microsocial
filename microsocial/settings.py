@@ -44,7 +44,7 @@ INSTALLED_APPS = (
     'person',
 )
 
-# SITE_ID = 1
+SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -74,7 +74,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
