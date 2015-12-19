@@ -11,6 +11,21 @@ urlpatterns = [
         name='main'
     ),
     url(
+        r'^login$',
+        TemplateView.as_view(template_name='microsocial/login.html'),
+        name='login'
+    ),
+    url(
+        r'^registration$',
+        TemplateView.as_view(template_name='microsocial/registration.html'),
+        name='registration'
+    ),
+    url(
+        r'^password-recovery',
+        TemplateView.as_view(template_name='microsocial/password_recovery_email.html'),
+        name='password-recovery'
+    ),
+    url(
         r'^admin',
         include(admin.site.urls),
     ),
