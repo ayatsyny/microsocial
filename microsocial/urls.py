@@ -26,6 +26,10 @@ urlpatterns = [
         name='password-recovery'
     ),
     url(
+        r'^person',
+        include('person.urls')
+    ),
+    url(
         r'^admin',
         include(admin.site.urls),
     ),

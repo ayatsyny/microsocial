@@ -18,9 +18,9 @@ class Person(models.Model):
     work_place = models.CharField(verbose_name=u'место работы', max_length=120, blank=True)
     info_yourself = models.TextField(verbose_name=u'о себе', max_length=500, blank=True)
     interests = models.TextField(verbose_name=u'интересы', max_length=400, blank=True)
-    image = models.ImageField(default='img_default/avatar.jpg', upload_to='img')
-    friends = models.ManyToManyField('self', symmetrical=True)
-    login_id = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='login')
+    image = models.ImageField(verbose_name=u'картинка', default='img_default/avatar.jpg', upload_to='img', blank=True)
+    friends = models.ManyToManyField('self', symmetrical=True, verbose_name=u'друзья', blank=True)
+    login = models.OneToOneField(settings.AUTH_USER_MODEL, default=None, verbose_name=u'логин')
 
     class Meta:
         verbose_name = u'контактное лицо'
