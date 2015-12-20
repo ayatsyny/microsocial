@@ -1,4 +1,4 @@
-{% load static %}
+{% load static flatpages %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -23,8 +23,12 @@
     <div class="container">
         {% block footer %}
             <p class="text-muted text-center margin">
-                &copy; Copyright 2014
+                {% get_flatpages as flatpages %}
+                {% for page in flatpages %}
+                    <a href="{% url 'flatpage' url=page.url %}">{{ page.title }}</a>
+                {% endfor %}
             </p>
+            &copy; Copyright 2014
         {% endblock %}
     </div>
 </footer>
