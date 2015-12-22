@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Django settings for microsocial project.
 
@@ -24,7 +25,6 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-INTERNAL_IPS = ('127.0.0.1',)
 
 ALLOWED_HOSTS = []
 
@@ -48,12 +48,33 @@ SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
+# TEMPLATE_CONTEXT_PROCESSORS = (
+#     "django.contrib.auth.context_processors.auth",
+#     "django.template.context_processors.debug",
+#     "django.template.context_processors.i18n",
+#     "django.template.context_processors.media",
+#     "django.template.context_processors.static",
+#     "django.template.context_processors.tz",
+#     "django.contrib.messages.context_processors.messages",
+# )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
 )
 
 ROOT_URLCONF = 'microsocial.urls'
@@ -74,7 +95,12 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'ru'
+LANGUAGES = (
+    ('en', u'English'),
+    ('ru', u'Русский'),
+)
+
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
@@ -85,6 +111,7 @@ USE_L10N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
@@ -92,6 +119,10 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 
 AUTH_USER_MODEL = 'microsocial.User'
 

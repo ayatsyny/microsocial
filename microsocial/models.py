@@ -28,8 +28,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
-    name = models.CharField(max_length=30)
+    email = models.EmailField('email', unique=True)
+    name = models.CharField(_('name'), max_length=30)
     is_staff = models.BooleanField(_('staff status'), default=False,
                                    help_text=_('Designates whether the user can log into this admin ' 'site.'))
     is_active = models.BooleanField(_('active'), default=True,

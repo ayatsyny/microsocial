@@ -1,0 +1,167 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-12-20 13:12+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\microsocial\forms.py:20
+msgid "The two password fields didn't match"
+msgstr ""
+
+#: .\microsocial\models.py:32
+msgid "name"
+msgstr ""
+
+#: .\microsocial\models.py:33
+msgid "staff status"
+msgstr ""
+
+#: .\microsocial\models.py:34
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: .\microsocial\models.py:35
+msgid "active"
+msgstr ""
+
+#: .\microsocial\models.py:36
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: .\microsocial\models.py:38
+msgid "date joined"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\login.html:5
+#: .\microsocial\templates\microsocial\password_recovery_email.html:13
+#: .\microsocial\templates\microsocial\registration.html:25
+msgid "авторизация"
+msgstr "authorization"
+
+#: .\microsocial\templates\microsocial\login.html:13
+#: .\microsocial\templates\microsocial\password_recovery_change.html:9
+#: .\microsocial\templates\microsocial\password_recovery_change.html:13
+#: .\microsocial\templates\microsocial\registration.html:17
+#: .\microsocial\templates\microsocial\registration.html:21
+msgid "пароль"
+msgstr "password"
+
+#: .\microsocial\templates\microsocial\login.html:15
+msgid "войти"
+msgstr "to login"
+
+#: .\microsocial\templates\microsocial\login.html:17
+msgid "забыли пароль"
+msgstr "forgot your password"
+
+#: .\microsocial\templates\microsocial\login.html:18
+#: .\microsocial\templates\microsocial\registration.html:5
+msgid "регистрация"
+msgstr "registration"
+
+#: .\microsocial\templates\microsocial\password_recovery_change.html:5
+msgid "новый пароль"
+msgstr "new password"
+
+#: .\microsocial\templates\microsocial\password_recovery_change.html:15
+msgid "сохранить"
+msgstr "save"
+
+#: .\microsocial\templates\microsocial\password_recovery_email.html:5
+msgid "востановление пароля"
+msgstr "password recovery"
+
+#: .\microsocial\templates\microsocial\password_recovery_email.html:11
+msgid "востановить пароль"
+msgstr "restore password"
+
+#: .\microsocial\templates\microsocial\registration.html:9
+#: .\person\models.py:14
+msgid "имя"
+msgstr "name"
+
+#: .\microsocial\templates\microsocial\registration.html:23
+msgid "зарегистрироваться"
+msgstr "sign up"
+
+#: .\person\models.py:11
+msgid "мужской"
+msgstr "male"
+
+#: .\person\models.py:12
+msgid "женский"
+msgstr "female"
+
+#: .\person\models.py:15
+msgid "фамилия"
+msgstr "surname"
+
+#: .\person\models.py:16
+msgid "пол"
+msgstr "sex"
+
+#: .\person\models.py:17
+msgid "дата рождения"
+msgstr "date of birth"
+
+#: .\person\models.py:18
+msgid "город"
+msgstr "city"
+
+#: .\person\models.py:19
+msgid "место работы"
+msgstr "place of work"
+
+#: .\person\models.py:20
+msgid "о себе"
+msgstr "about youself"
+
+#: .\person\models.py:21
+msgid "интересы"
+msgstr "interests"
+
+#: .\person\models.py:22
+msgid "картинка"
+msgstr "picture"
+
+#: .\person\models.py:23
+msgid "друзья"
+msgstr "friends"
+
+#: .\person\models.py:24
+msgid "логин"
+msgstr "login"
+
+#: .\person\models.py:27
+msgid "контактное лицо"
+msgstr "contact person"
+
+#: .\person\models.py:28
+msgid "контактные лица"
+msgstr "contact persons"
+
+#: .\person\models.py:36
+msgid "пользователь"
+msgstr "user"
+
+#: .\person\models.py:37
+msgid "дата создания"
+msgstr "date of creation"
+
+#: .\person\models.py:38
+msgid "сообщение"
+msgstr "message"

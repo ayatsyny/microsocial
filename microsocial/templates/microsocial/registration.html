@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
-    <h1>регистрация</h1>
+    <h1>{% trans 'регистрация'|capfirst %}</h1>
     <form>
         <div class="form-group">
             <label for="exampleInputName"></label>
-            <input type="text" class="form-control" id="exampleInputName" placeholder="имя">
+            <input type="text" class="form-control" id="exampleInputName" placeholder={% trans 'имя' %}>
         </div>
         <div class="form-group">
             <label for="exampleInputEmail"></label>
@@ -13,13 +14,13 @@
         </div>
         <div class="form-group">
             <label for="exampleInputPassword1"></label>
-            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="пароль">
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder={% trans 'пароль' %}>
         </div>
         <div class="form-group">
             <label for="exampleInputPassword2"></label>
-            <input type="password" class="form-control" id="exampleInputPassword2" placeholder="пароль">
+            <input type="password" class="form-control" id="exampleInputPassword2" placeholder={% trans 'пароль' %}>
         </div>
-        <button type="submit" class="btn btn-default">зарегистрироваться</button>
+        <button type="submit" class="btn btn-default">{% trans 'зарегистрироваться'|capfirst %}</button>
     </form>
-    <a href=#>авторизация</a>
+    <a href=#>{% trans 'авторизация'|capfirst %}</a>
 {% endblock %}

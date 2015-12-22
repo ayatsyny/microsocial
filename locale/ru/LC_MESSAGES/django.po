@@ -1,0 +1,169 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-12-20 13:12+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: .\microsocial\forms.py:20
+msgid "The two password fields didn't match"
+msgstr "Два поля паролей не совпадают"
+
+#: .\microsocial\models.py:32
+msgid "name"
+msgstr "имя"
+
+#: .\microsocial\models.py:33
+msgid "staff status"
+msgstr "статус персонала"
+
+#: .\microsocial\models.py:34
+msgid "Designates whether the user can log into this admin site."
+msgstr "Обозначает, может ли пользователь войти в этот администратора сайта."
+
+#: .\microsocial\models.py:35
+msgid "active"
+msgstr "активный"
+
+#: .\microsocial\models.py:36
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "Обозначает ли это пользователь должен рассматриваться как активный. Отмените этот Вместо удаления учетных записей."
+
+#: .\microsocial\models.py:38
+msgid "date joined"
+msgstr "дата создания"
+
+#: .\microsocial\templates\microsocial\login.html:5
+#: .\microsocial\templates\microsocial\password_recovery_email.html:13
+#: .\microsocial\templates\microsocial\registration.html:25
+msgid "авторизация"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\login.html:13
+#: .\microsocial\templates\microsocial\password_recovery_change.html:9
+#: .\microsocial\templates\microsocial\password_recovery_change.html:13
+#: .\microsocial\templates\microsocial\registration.html:17
+#: .\microsocial\templates\microsocial\registration.html:21
+msgid "пароль"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\login.html:15
+msgid "войти"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\login.html:17
+msgid "забыли пароль"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\login.html:18
+#: .\microsocial\templates\microsocial\registration.html:5
+msgid "регистрация"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\password_recovery_change.html:5
+msgid "новый пароль"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\password_recovery_change.html:15
+msgid "сохранить"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\password_recovery_email.html:5
+msgid "востановление пароля"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\password_recovery_email.html:11
+msgid "востановить пароль"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\registration.html:9
+#: .\person\models.py:14
+msgid "имя"
+msgstr ""
+
+#: .\microsocial\templates\microsocial\registration.html:23
+msgid "зарегистрироваться"
+msgstr ""
+
+#: .\person\models.py:11
+msgid "мужской"
+msgstr ""
+
+#: .\person\models.py:12
+msgid "женский"
+msgstr ""
+
+#: .\person\models.py:15
+msgid "фамилия"
+msgstr ""
+
+#: .\person\models.py:16
+msgid "пол"
+msgstr ""
+
+#: .\person\models.py:17
+msgid "дата рождения"
+msgstr ""
+
+#: .\person\models.py:18
+msgid "город"
+msgstr ""
+
+#: .\person\models.py:19
+msgid "место работы"
+msgstr ""
+
+#: .\person\models.py:20
+msgid "о себе"
+msgstr ""
+
+#: .\person\models.py:21
+msgid "интересы"
+msgstr ""
+
+#: .\person\models.py:22
+msgid "картинка"
+msgstr ""
+
+#: .\person\models.py:23
+msgid "друзья"
+msgstr ""
+
+#: .\person\models.py:24
+msgid "логин"
+msgstr ""
+
+#: .\person\models.py:27
+msgid "контактное лицо"
+msgstr ""
+
+#: .\person\models.py:28
+msgid "контактные лица"
+msgstr ""
+
+#: .\person\models.py:36
+msgid "пользователь"
+msgstr ""
+
+#: .\person\models.py:37
+msgid "дата создания"
+msgstr ""
+
+#: .\person\models.py:38
+msgid "сообщение"
+msgstr ""
