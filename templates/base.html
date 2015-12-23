@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}microsocial{% endblock %}</title>
+    <title>{% block title %}{{ DEFAULT_TITLE }}{% endblock %}</title>
     <link rel="shortcut icon" href="{% static 'microsocial/img/logo.jpg' %}" type="image/x-icon">
     {% block css %}
         <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -22,18 +22,20 @@
 <footer class="base">
     <div class="container">
         {% block footer %}
-            <p class="text-muted text-center margin">
+            <p class="text-center text-muted margin">
+            <p class="text-center margin flatpages">
                 {% get_flatpages as flatpages %}
                 {% for page in flatpages %}
                     <a href="{% url 'flatpage' url=page.url %}">{{ page.title }}</a>
                 {% endfor %}
             </p>
-            &copy; Copyright 2014
+            &copy; {% now 'Y' %} Microsocial
+            </p>
         {% endblock %}
     </div>
 </footer>
 {% block js %}
-    <script scr="{% static 'common/js/jquery-2.1.3.min.js' %}"></script>
+    <script src="{% static 'common/js/jquery-2.1.3.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 </body>

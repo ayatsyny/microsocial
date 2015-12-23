@@ -7,40 +7,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, RedirectView
 #from django.contrib.flatpages.urls import urlpatterns as flatpages_urlpatterns
 from django.views.i18n import set_language
+from microsocial import views
+
 
 urlpatterns = [
     url(
         r'^$',
-        TemplateView.as_view(template_name='base.html'),
+        views.main,
         name='main'
     ),
-    url(
-        r'^login$',
-        TemplateView.as_view(template_name='microsocial/login.html'),
-        name='login'
-    ),
-    url(
-        r'^registration$',
-        TemplateView.as_view(template_name='microsocial/registration.html'),
-        name='registration'
-    ),
-    url(
-        r'^password-recovery',
-        TemplateView.as_view(template_name='microsocial/password_recovery_email.html'),
-        name='password-recovery'
-    ),
-    url(
-        r'^person',
-        include('person.urls')
-    ),
-    url(
-        r'^admin',
-        include(admin.site.urls),
-    ),
-    url(
-        r'^logo\.jpg$',
-        RedirectView.as_view(url=static('microsocial/img/logo.jpg')),
-    ),
+    url(r'^users/', include('users.urls')),
+    url(r'^auths/', include('auths.urls')),
+    url(r'^admin', include(admin.site.urls)),
     url(r'^18n/setlang/$', csrf_exempt(set_language), name='set_language'),
     # url(
     #     r'^i18n/setlang/$',

@@ -148,7 +148,7 @@ msgstr "login"
 
 #: .\person\models.py:27
 msgid "контактное лицо"
-msgstr "contact person"
+msgstr "contact users"
 
 #: .\person\models.py:28
 msgid "контактные лица"

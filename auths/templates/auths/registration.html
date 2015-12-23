@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% block content %}
+    registration
     <h1>{% trans 'регистрация'|capfirst %}</h1>
     <form>
         <div class="form-group">
@@ -22,5 +23,5 @@
         </div>
         <button type="submit" class="btn btn-default">{% trans 'зарегистрироваться'|capfirst %}</button>
     </form>
-    <a href=#>{% trans 'авторизация'|capfirst %}</a>
+    <a href={% url 'login' %}>{% trans 'авторизация'|capfirst %}</a>
 {% endblock %}

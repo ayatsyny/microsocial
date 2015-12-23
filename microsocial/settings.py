@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+_ = lambda s: s
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -41,14 +43,15 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.flatpages',
     'microsocial',
-    'person',
+    'users',
+    'auths',
 )
 
 SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # 'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -57,15 +60,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-# TEMPLATE_CONTEXT_PROCESSORS = (
-#     "django.contrib.auth.context_processors.auth",
-#     "django.template.context_processors.debug",
-#     "django.template.context_processors.i18n",
-#     "django.template.context_processors.media",
-#     "django.template.context_processors.static",
-#     "django.template.context_processors.tz",
-#     "django.contrib.messages.context_processors.messages",
-# )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -96,8 +90,8 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
 LANGUAGES = (
-    ('en', u'English'),
-    ('ru', u'Русский'),
+    ('en', _(u'English')),
+    ('ru', _(u'Русский')),
 )
 
 LANGUAGE_CODE = 'en'
@@ -124,6 +118,8 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
 )
 
-AUTH_USER_MODEL = 'microsocial.User'
+AUTH_USER_MODEL = 'users.User'
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+
+LOGIN_URL = 'login'
