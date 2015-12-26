@@ -3,3 +3,6 @@
 
 # DB
 db.sqlite3
+
+# dir tmp
+tmp

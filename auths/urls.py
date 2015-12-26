@@ -1,6 +1,5 @@
 # coding=utf-8
-from django.conf.urls import url
-
+from django.conf.urls import url, include
 from auths import views
 
 urlpatterns = [
@@ -10,9 +9,17 @@ urlpatterns = [
         name='login'
     ),
     url(
-        r'^registration$',
-        views.RegistrationView.as_view(),
-        name='registration'
+        r'^registration', include([
+            url(
+                r'^$',
+                views.RegistrationView.as_view(),
+                name='registration'
+            ),
+            url(
+                r'^/(?P<activation_link>[\w\W\S]+)/$',
+                views.register_confirm,
+            ),
+        ])
     ),
     url(
         r'^password-recovery$',

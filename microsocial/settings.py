@@ -120,6 +120,12 @@ LOCALE_PATHS = (
 
 AUTH_USER_MODEL = 'users.User'
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR,  'templates'),
+    os.path.join(BASE_DIR, 'auths/templates'),
+)
 
 LOGIN_URL = 'login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp', 'email')  # change this to a proper location

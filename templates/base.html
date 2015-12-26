@@ -1,4 +1,4 @@
-{% load static flatpages i18n %}
+{% load static flatpages i18n authsstags %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -17,7 +17,14 @@
     {% block head %}
         {% include 'header.html' %}
     {% endblock %}
-    {% block content %}{% endblock %}
+
+    {% block messages %}
+        {% include 'tags/messages.html' %}
+    {% endblock %}
+
+    {% block content %}
+
+    {% endblock %}
 </div>
 <footer class="base">
     <div class="container">

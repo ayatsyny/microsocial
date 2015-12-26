@@ -40,7 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_(u'имя'), max_length=30)
     last_name = models.CharField(_(u'фамилия'), max_length=30, blank=True)
     sex = models.SmallIntegerField(_(u'пол'), choices=SEX_CHOICES, default=SEX_NONE)
-    birth_date = models.DateField(_(u'дата рождения'), blank=True)
+    birth_date = models.DateField(_(u'дата рождения'), null=True, blank=True)
     city = models.CharField(_(u'город'), max_length=80, blank=True)
     work_place = models.CharField(_(u'место работы'), max_length=120, blank=True)
     about_me = models.TextField(_(u'о себе'), max_length=1000, blank=True)
@@ -53,6 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                                 'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     friends = models.ManyToManyField('self', symmetrical=True, verbose_name=_(u'друзья'), blank=True)
+    confirned_registration = models.BooleanField(default=False, editable=False)
 
     class Meta:
         verbose_name = _(u'контактное лицо')

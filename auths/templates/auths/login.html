@@ -2,9 +2,8 @@
 {% load i18n %}
 
 {% block content %}
-    login
     <h1>{% trans 'авторизация'|capfirst %}</h1>
-    <form>
+    <form method="post">
         <div class="form-group">
             <label for="exampleInputEmail"></label>
             <input type="email" class="form-control" id="exampleInputEmail" placeholder="email">
