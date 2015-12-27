@@ -128,4 +128,4 @@ TEMPLATE_DIRS = (
 LOGIN_URL = 'login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp', 'email')  # change this to a proper location
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp', 'email')

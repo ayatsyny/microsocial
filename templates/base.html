@@ -1,4 +1,4 @@
-{% load static flatpages i18n authsstags %}
+{% load static flatpages i18n microsocial %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -18,10 +18,7 @@
         {% include 'header.html' %}
     {% endblock %}
 
-    {% block messages %}
-        {% include 'tags/messages.html' %}
-    {% endblock %}
-
+{% show_messages %}
     {% block content %}
 
     {% endblock %}

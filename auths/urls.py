@@ -9,15 +9,16 @@ urlpatterns = [
         name='login'
     ),
     url(
-        r'^registration', include([
+        r'^registration/', include([
             url(
                 r'^$',
                 views.RegistrationView.as_view(),
                 name='registration'
             ),
             url(
-                r'^/(?P<activation_link>[\w\W\S]+)/$',
-                views.register_confirm,
+                r'^(?P<token>.+)/$',
+                views.RegistrationConfirmView.as_view(),
+                name='registration_confirm'
             ),
         ])
     ),

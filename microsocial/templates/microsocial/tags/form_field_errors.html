@@ -1,0 +1,13 @@
+{% if errors %}
+    {% if block_class %}
+        <div class="row">
+            <div class="{{ block_class }}">
+    {% endif %}
+    {% for error in errors %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+    {% if block_class %}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
