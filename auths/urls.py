@@ -22,9 +22,26 @@ urlpatterns = [
             ),
         ])
     ),
+    # url(r'^password-recovery/(?P<token>.+)/$', views.ChangePasswordView.as_view(), name='password_recovery_confirm'),
     url(
-        r'^password-recovery$',
-        views.PasswordRecoveryView.as_view(),
-        name='password_recovery'
+        r'^password-recovery/', include([
+            url(
+                r'^$',
+                views.PasswordRecoveryView.as_view(),
+                name='password_recovery'
+            ),
+            url(
+                r'^(?P<token>.+)/$',
+                views.ChangePasswordView.as_view(),
+                name='password_recovery_confirm'
+            ),
+        ]),
+
     ),
+    url(r'^logout/$', views.logout_view, name='logout'),
+    # url(
+    #     r'^password-recovery$',
+    #     views.PasswordRecoveryView.as_view(),
+    #     name='password_recovery'
+    # ),
 ]

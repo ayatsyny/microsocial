@@ -1,6 +1,6 @@
 # coding=utf-8
 from django.contrib.sites.models import Site
-from django.core.signing import Signer
+from django.core.signing import Signer, TimestampSigner
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -89,4 +89,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.email_user(
             ugettext(u'Подтвердите регистрацию на Microsocial'),
             ugettext(u'Для подтверждения перейдите по ссылке: {}'.format(url))
+        )
+
+    def send_recovery_email(self):
+        url = 'http://{}{}'.format(
+            Site.objects.get_current().domain,
+            reverse('password_recovery_confirm', kwargs={
+                'token': TimestampSigner(salt='password-recovery-confirm').sign(self.last_login)
+            })
+        )
+        self.email_user(
+            ugettext(u'Подтвердите изменение пароля'),
+            ugettext(u'Для подтверждения перейдите по ссылке: {}'.format(url)),
+            ugettext(u'Внимание данная ссылка будет действовать 48 часов')
         )

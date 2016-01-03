@@ -4,5 +4,5 @@ from django.shortcuts import redirect
 
 
 @login_required
-def main(requests):
-    return redirect('user_profile', user_id=requests.user.pk, permanent=False)
+def main(request):
+    return redirect('user_profile', user_id=request.user.pk, permanent=False)

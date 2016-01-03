@@ -1,37 +1,21 @@
 # coding=utf-8
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.core.signing import Signer, BadSignature
+from django.contrib import auth
+from django.contrib.auth.views import login, logout_then_login
+from django.core.signing import Signer, BadSignature, TimestampSigner, SignatureExpired
 from django.core.urlresolvers import reverse_lazy
-from django.http import Http404
-from django.shortcuts import render, redirect, render_to_response, get_object_or_404
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, RedirectView
-from auths.forms import RegistrationForm
+from django.core.urlresolvers import reverse
+from auths.forms import RegistrationForm, AuthenticationForm, PasswordResetForm, SetPasswordForm
 from microsocial import settings
 from users.models import User
 from django.utils.translation import ugettext as _
 
 
-signer = Signer(salt='registration-confirm')
-
-def login_view(request):
-    return render(request, 'auths/login.html')
-
-
-# def register_confirm(request, activation_link):
-#     try:
-#          signer.unsign(activation_link)
-#     except BadSignature:
-#         raise Http404
-#     else:
-#         user_profile = get_object_or_404(UserProfile, activation_link=activation_link)
-#         if user_profile.user.confirned_registration:
-#             raise Http404
-#         else:
-#             user_profile.user.confirned_registration = True
-#             user_profile.user.save()
-#             messages.success(request, _(u'Авторизируйтесь пожалуйста'))
-#             return redirect('login')
+def logout_view(request):
+    return logout_then_login(request)
 
 
 class RegistrationView(TemplateView):
@@ -59,22 +43,6 @@ class RegistrationView(TemplateView):
             return redirect(request.path)
         return self.get(request, *args, **kwargs)
 
-    # def post(self, request, *args, **kwargs):
-    #     if self.form.is_valid():
-    #         self.form.save()
-    #         first_name = self.form.cleaned_data['first_name']
-    #         email = self.form.cleaned_data['email']
-    #         activation_link = signer.sign(first_name)
-    #         user = User.objects.get(email=email)
-    #         new_profile = UserProfile(user=user, activation_link=activation_link)
-    #         new_profile.save()
-    #         email_subject = _(u'Подтверждение регистрации')
-    #         email_body = _(u'Cпасибо за регистрацию. Чтобы активировать свой аккаунт, нажмите на эту ссылку  ') + \
-    #                      request.build_absolute_uri() + u'/{}/'.format(activation_link)
-    #         send_mail(email_subject, email_body, 'admin@site.com', [email], fail_silently=False)
-    #         return render_to_response('auths/successful_registration.html')
-    #     return render(request, 'auths/registration.html', {'form': self.form})
-
 
 class RegistrationConfirmView(RedirectView):
     url = reverse_lazy(settings.LOGIN_URL)
@@ -96,5 +64,71 @@ class RegistrationConfirmView(RedirectView):
         return super(RegistrationConfirmView, self).dispatch(request, *args, **kwargs)
 
 
+def login_view(request):
+    if request.user.is_authenticated():
+        return redirect('main')
+    response = login(request, 'auths/login.html', 'login', authentication_form=AuthenticationForm)
+    return response
+
+
 class PasswordRecoveryView(TemplateView):
     template_name = 'auths/password_recovery.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return redirect('main')
+        self.form = PasswordResetForm(request.POST or None)
+        return super(PasswordRecoveryView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(PasswordRecoveryView, self).get_context_data(**kwargs)
+        context['form'] = self.form
+        if 'change_password_user_id' in self.request.session:
+            context['change_password_user_id'] = User.objects.get(pk=self.request.session['change_password_user_id'])
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            user = self.form.get_user()
+            user.send_recovery_email()
+            request.session['change_password_user_id'] = user.pk
+            return redirect('password_recovery')
+        return self.get(request, *args, **kwargs)
+
+
+class ChangePasswordView(TemplateView):
+    template_name = 'auths/password_change.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            user_last_login = TimestampSigner(salt='password-recovery-confirm').unsign(kwargs['token'], max_age=60*60*48)
+        except (BadSignature, SignatureExpired):
+            raise Http404
+        user = None
+        if 'change_password_user_id' in self.request.session:
+                user = User.objects.get(pk=self.request.session['change_password_user_id'])
+        if unicode(user.last_login) != unicode(user_last_login):
+            raise Http404
+        if not user.confirned_registration:
+            user.confirned_registration = True
+            user.save(update_fields=('confirned_registration',))
+        self.form = SetPasswordForm(request.POST or None, user=user)
+        return super(ChangePasswordView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ChangePasswordView, self).get_context_data(**kwargs)
+        context['form'] = self.form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.form.save()
+            password = self.form.cleaned_data['password1']
+            user = auth.authenticate(username=self.form.user.email, password=password)
+            if user is not None and user.is_active:
+                messages.success(request, _(u'Вы успешно изменили пароль.'))
+                auth.login(request, user)
+            else:
+                print('The username and password were incorrect.')
+            return redirect('user_profile', user_id=self.form.user.pk, permanent=False)
+        return self.get(request, *args, **kwargs)

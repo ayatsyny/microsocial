@@ -104,7 +104,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -126,6 +126,7 @@ TEMPLATE_DIRS = (
 )
 
 LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'main'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp', 'email')
