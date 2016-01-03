@@ -15,3 +15,10 @@ def show_form_field_errors(field_errors, block_class=None):
         'errors': field_errors,
         'block_class': block_class,
     }
+
+@register.inclusion_tag('microsocial/tags/form_field_errors.html')
+def show_form_errors(form, block_class=None):
+    return {
+        'errors': form.non_field_errors(),
+        'block_class': block_class,
+    }

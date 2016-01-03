@@ -1,6 +1,9 @@
 # coding=utf-8
 from django.conf.urls import url, include
+from django.contrib.auth.views import logout
+
 from auths import views
+from microsocial import settings
 
 urlpatterns = [
     url(
@@ -31,11 +34,15 @@ urlpatterns = [
             ),
             url(
                 r'^(?P<token>.+)/$',
-                views.ChangePasswordView.as_view(),
+                views.PasswordRecoveryConfirmView.as_view(),
                 name='password_recovery_confirm'
             ),
         ]),
-
     ),
-    url(r'^logout/$', views.logout_view, name='logout'),
+    url(
+        r'^logout/$',
+        logout,
+        {'next_page': settings.LOGIN_URL},
+        name='logout'
+    ),
 ]
