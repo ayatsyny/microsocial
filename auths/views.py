@@ -4,10 +4,9 @@ from django.contrib import auth
 from django.contrib.auth.views import login, logout_then_login
 from django.core.signing import Signer, BadSignature, TimestampSigner, SignatureExpired
 from django.core.urlresolvers import reverse_lazy
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, RedirectView
-from django.core.urlresolvers import reverse
 from auths.forms import RegistrationForm, AuthenticationForm, PasswordResetForm, SetPasswordForm
 from microsocial import settings
 from users.models import User

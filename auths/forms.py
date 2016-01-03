@@ -1,7 +1,6 @@
 # coding=utf-8
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
-from django.core.exceptions import ValidationError
 from django.utils.text import capfirst
 from microsocial.forms import BootstrapFormMixin
 from users.models import User
@@ -68,7 +67,6 @@ class AuthenticationForm(forms.ModelForm, BootstrapFormMixin):
             self.user_cache = authenticate(email=email,
                                            password=password)
             if self.user_cache is None:
-                # self.add_error('password', ValidationError(ugettext(u'Пожалуйста, введите правильный %(email)s и пароль. '), code='invalid_login'))
                 raise forms.ValidationError(
                      ugettext(u'Пожалуйста, введите правильный %(email)s и пароль. '), code='invalid_login',
                 )
@@ -76,8 +74,6 @@ class AuthenticationForm(forms.ModelForm, BootstrapFormMixin):
             raise forms.ValidationError(
                      ugettext(u'Пожалуйста, введите правильный %(email)s и пароль. '), code='invalid_login',
             )
-            #     self.confirm_login_allowed(self.user_cache)
-        # return self.cleaned_data
 
     def get_user_id(self):
         if self.user_cache:
