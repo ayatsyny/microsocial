@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load i18n microsocial %}
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-xs-offset-3 col-xs-6">
+                <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_profile">
+                    {% for field in form_change_profile %}
+                        {% show_form_field_errors field.errors 'col-sm-offset-4 col-sm-8' %}
+                        <div class="form-group {% if field.errors %} has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="control-label col-sm-4">
+                                {{ field.label|capfirst }}:
+                            </label>
+                            <div class="col-sm-8">
+                                {{ field }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-8">
+                            <input type="submit" name="change_profile" class="btn btn-primary"
+                                   value="{% trans 'сохранить'|capfirst %}">
+                        </div>
+                    </div>
+                </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-offset-3 col-xs-6">
+        <h1 class="text-center">{% trans 'изменение пароля'|capfirst %}</h1>
+                <form class="form-horizontal" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_password">
+                    {% for field in form_change_password %}
+                        {% show_form_field_errors field.errors 'col-sm-offset-4 col-sm-8' %}
+                        <div class="form-group {% if field.errors %} has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="control-label col-sm-4">
+                                {{ field.label|capfirst }}:
+                            </label>
+                            <div class="col-sm-8">
+                                {{ field }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-8">
+                            <input type="submit" name="change_password" class="btn btn-primary"
+                                   value="{% trans 'измененить пароль'|capfirst %}">
+                        </div>
+                    </div>
+                </form>
+        </div>
+    </div>
+     <div class="row">
+        <div class="col-xs-offset-3 col-xs-6">
+        <h1 class="text-center">{% trans 'изменение email'|capfirst %}</h1>
+                <form class="form-horizontal" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_email">
+                    {% for field in form_change_email %}
+                        {% show_form_field_errors field.errors 'col-sm-offset-4 col-sm-8' %}
+                        <div class="form-group {% if field.errors %} has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="control-label col-sm-4">
+                                {{ field.label|capfirst }}:
+                            </label>
+                            <div class="col-sm-8">
+                                {{ field }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-8">
+                            <input type="submit" name="change_email" class="btn btn-primary"
+                                   value="{% trans 'измененить email'|capfirst %}">
+                        </div>
+                    </div>
+                </form>
+        </div>
+    </div>
+{% endblock %}

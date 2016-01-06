@@ -3,6 +3,7 @@ from django.conf.urls import url, include
 from django.contrib.auth.views import logout
 
 from auths import views
+from auths.views import SettingsView
 from microsocial import settings
 
 urlpatterns = [
@@ -44,5 +45,10 @@ urlpatterns = [
         logout,
         {'next_page': settings.LOGIN_URL},
         name='logout'
+    ),
+    url(
+        r'^settings/$',
+        SettingsView.as_view(),
+        name='settings'
     ),
 ]
