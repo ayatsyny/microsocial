@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load i18n microsocial %}
+
+
+{% block content %}
+
+    <form class="form-horizontal" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="profile">
+    <div class="row">
+        <div class="col-sm-3">
+            {% if profile_form.instance.avatar %}
+                <img class="img-responsive" src="{{ profile_form.instance.avatar.url }}">
+                <div class="checkbox" style="margin: 10px 0;">
+                <label>
+                    <input type="checkbox" id="id_profile_avatar" name="profile-avatar-clear">
+                    {% trans 'удалить'|capfirst %}
+                </label>
+                </div>
+            {% else %}
+                <p>{% trans 'У вас еще нету аватарки :(' %}</p>
+            {% endif %}
+        <div>
+            <input type="file" id="id_profile-avatar" name="profile-avatar">
+        </div>
+        </div>
+    <div class="col-sm-9">
+        {% for field in profile_form %}
+            {% if field.name != 'avatar' %}
+                {% show_form_field_errors field.errors 'col-sm-offset-3 col-sm-9' %}
+                <div class="form-group{% if field.errors %} has-error{% endif %}">
+                <label for="{{ field.id_for_label }}" class="control-label col-sm-3">
+                    {{ field.label|capfirst }}
+                </label>
+                <div class="col-sm-9">
+                    {{ field  }}
+                </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <input type="submit" class="btn btn-primary" value="{% trans 'сохранить'|capfirst %}">
+        </div>
+    </div>
+    </div>
+    </div>
+    </form>
+
+
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="password">
+    <div class="row">
+        <div class="cll-sm-offset-3 col-sm-9">
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <h2>{% trans 'изменение пароля'|capfirst %}</h2>
+                </div>
+            </div>
+            {% for field in password_form %}
+                        {% show_form_field_errors field.errors 'col-sm-offset-3 col-sm-9' %}
+                        <div class="form-group {% if field.errors %} has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="control-label col-sm-3">
+                                {{ field.label|capfirst }}:
+                            </label>
+                            <div class="col-sm-9">
+                                {{ field }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <input type="submit" class="btn btn-primary" value="{% trans 'измененить пароль'|capfirst %}">
+                        </div>
+                    </div>
+        </div>
+    </div>
+    </form>
+
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="email">
+    <div class="row">
+        <div class="cll-sm-offset-3 col-sm-9">
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <h2>{% trans 'изменение email'|capfirst %}</h2>
+                </div>
+            </div>
+            <div class="form-group">
+        <label class="control-label col-sm-3">
+                                {% trans 'текущий email'|capfirst %}:
+                            </label>
+                            <div class="col-sm-9">
+                                <p class="form-control-static">{{ email_form.user.email }}</p>
+                            </div>
+                        </div>
+            {% for field in email_form %}
+                        {% show_form_field_errors field.errors 'col-sm-offset-3 col-sm-9' %}
+                        <div class="form-group {% if field.errors %} has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="control-label col-sm-3">
+                                {{ field.label|capfirst }}:
+                            </label>
+                            <div class="col-sm-9">
+                                {{ field }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <input type="submit" class="btn btn-primary" value="{% trans 'измененить email'|capfirst %}">
+                        </div>
+                    </div>
+        </div>
+    </div>
+    </form>
+
+{% endblock %}

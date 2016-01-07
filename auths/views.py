@@ -1,14 +1,13 @@
 # coding=utf-8
 from django.contrib import messages
-from django.contrib.auth import login as auth_login, update_session_auth_hash
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import login
 from django.core.signing import Signer, BadSignature, TimestampSigner, SignatureExpired
 from django.core.urlresolvers import reverse_lazy
 from django.http import Http404
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.views.generic import TemplateView, RedirectView
-from auths.forms import RegistrationForm, LoginForm, PasswordRecoveryForm, NewPasswordForm, ChangeProfileForm, \
-    ChangeOldPasswordForm, ChangeEmailForm
+from auths.forms import RegistrationForm, LoginForm, PasswordRecoveryForm, NewPasswordForm
 from microsocial import settings
 from users.models import User
 from django.utils.translation import ugettext as _
@@ -34,7 +33,6 @@ class RegistrationView(TemplateView):
         if self.form.is_valid():
             user = self.form.save()
             user.send_registration_email()
-            # todo send email
             request.session['registered_user_id'] = user.pk
             return redirect(request.path)
         return self.get(request, *args, **kwargs)
@@ -122,44 +120,6 @@ class PasswordRecoveryConfirmView(TemplateView):
             self.form.user.backend = 'django.contrib.auth.backends.ModelBackend'
             auth_login(request, self.form.user)
             messages.success(request, _(u'Вы успешно изменили пароль.'))
-            return redirect('user_profile', user_id=self.form.user.pk, permanent=False)
+            return redirect('user_settings')
         return self.get(request, *args, **kwargs)
 
-
-class SettingsView(TemplateView):
-    template_name = 'auths/settings.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.instance = get_object_or_404(User, pk=request.user.pk)
-        action = request.POST.get('action')
-        self.form_change_profile = ChangeProfileForm(request.POST if action == 'change_profile' else None,
-                                                     instance=self.instance, prefix='change_profile')
-        self.form_change_password = ChangeOldPasswordForm(
-                self.instance, request.POST if action == 'change_password' else None, prefix='change_password'
-        )
-        self.form_change_email = ChangeEmailForm(request.POST if action == 'change_email' else None,
-                                                 instance=self.instance)
-        return super(SettingsView, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(SettingsView, self).get_context_data(**kwargs)
-        context['form_change_profile'] = self.form_change_profile
-        context['form_change_password'] = self.form_change_password
-        context['form_change_email'] = self.form_change_email
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if self.form_change_profile.is_valid():
-            self.form_change_profile.save()
-            messages.success(request, _(u'Вы успешно изменили свой профиль.'))
-            return redirect(request.path)
-        elif self.form_change_password.is_valid():
-            self.form_change_password.save()
-            update_session_auth_hash(request, self.instance)
-            messages.success(request, _(u'Вы успешно изменили пароль.'))
-            return redirect(request.path)
-        elif self.form_change_email.is_valid():
-            self.form_change_email.save()
-            messages.success(request, _(u'Вы успешно изменили email.'))
-            return redirect(request.path)
-        return self.get(request, *args, **kwargs)

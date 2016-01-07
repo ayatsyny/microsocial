@@ -1,13 +1,17 @@
 # coding=utf-8
 import hashlib
+import os
+
 from django.contrib.sites.models import Site
 from django.core.signing import Signer, TimestampSigner
 from django.core.urlresolvers import reverse
+from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
+# from message.models import Message
 
 
 class UserManager(BaseUserManager):
@@ -31,6 +35,16 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, True, True, **extra_fields)
 
 
+def get_avatar_fn(instance, filename):
+    id_str = str(instance.pk)
+    return  'avatars/{sub_dir}/{id}_{rand}{ext}'.format(
+        sub_dir=id_str.zfill(2)[-2:],
+        id=id_str,
+        rand=get_random_string(8, 'abcdefghijklmnopqrstuvwxyz0123456789'),
+        ext=os.path.splitext(filename)[1],
+    )
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     SEX_NONE = 0
     SEX_MALE = 1
@@ -49,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     work_place = models.CharField(_(u'место работы'), max_length=120, blank=True)
     about_me = models.TextField(_(u'о себе'), max_length=1000, blank=True)
     interests = models.TextField(_(u'интересы'), max_length=1000, blank=True)
-    image = models.ImageField(_(u'картинка'), default='img_default/avatar.jpg', upload_to='img', blank=True)
+    avatar = models.ImageField(_(u'аватар'), upload_to=get_avatar_fn, blank=True)
     confirned_registration = models.BooleanField(_('confirmed registration'), default=True)
     is_staff = models.BooleanField(_('staff status'), default=False,
                                    help_text=_('Designates whether the user can log into this admin ' 'site.'))
@@ -58,6 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                                 'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     # friends = models.ManyToManyField('self', symmetrical=True, verbose_name=_(u'друзья'), blank=True)
+    # message = models.ForeignKey(Message, verbose_name=_(u'сообщения'), related_name='user')
 
     class Meta:
         verbose_name = _(u'контактное лицо')

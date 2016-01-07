@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'microsocial',
     'users',
     'auths',
+    'message',
 )
 
 SITE_ID = 1
