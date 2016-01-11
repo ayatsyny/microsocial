@@ -42,10 +42,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.flatpages',
+    'django.contrib.humanize',
     'microsocial',
     'users',
     'auths',
-    'message',
 )
 
 SITE_ID = 1

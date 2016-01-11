@@ -1,11 +1,12 @@
 # coding=utf-8
 from django.contrib.auth import BACKEND_SESSION_KEY, login
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
-from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm
-from users.models import User
+from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, MessageSendWallForm
+from users.models import User, PostWall
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
@@ -14,14 +15,31 @@ class UserProfileView(TemplateView):
     template_name = 'users/profile.html'
 
     def dispatch(self, request, *args, **kwargs):
-        self.instance = get_object_or_404(User, pk=request.user.pk)
-        # todo form
+        self.instance = get_object_or_404(User, pk=kwargs.get('user_id'))
+        self.qs = PostWall.objects.select_related('wall_owner', 'author').filter(wall_owner=self.instance.pk).order_by('-date_created',)
+        self.form = MessageSendWallForm(self.instance, request.user, request.POST or None)
+        paginator = Paginator(self.qs, 20)
+        page = request.GET.get('page')
+        try:
+            self.post_wall = paginator.page(page)
+        except PageNotAnInteger:
+            self.post_wall = paginator.page(1)
+        except EmptyPage:
+            self.post_wall = paginator.page(paginator.num_pages)
         return super(UserProfileView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(UserProfileView, self).get_context_data(**kwargs)
         context['user_profile'] = self.instance
+        context['post_wall'] = self.post_wall
+        context['form'] = self.form
         return context
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.form.save()
+            return redirect(request.path)
+        return self.get(request, *args, **kwargs)
 
 
 class UserSettingsView(TemplateView):
@@ -29,7 +47,6 @@ class UserSettingsView(TemplateView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        # self.instance = get_object_or_404(User, pk=request.user.pk)
         action = request.POST.get('action')
         self.profile_form = UserChangeProfileForm(
                 (request.POST if action == 'profile' else None),

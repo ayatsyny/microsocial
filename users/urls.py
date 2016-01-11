@@ -5,7 +5,7 @@ from users.views import UserSettingsView
 
 urlpatterns = [
     url(
-        r'^users/profile/(?P<user_id>\d+)/$',
+        r'^profile/(?P<user_id>\d+)/$',
         views.UserProfileView.as_view(),
         name='user_profile'
     ),

@@ -1,7 +1,6 @@
 # coding=utf-8
 import hashlib
 import os
-
 from django.contrib.sites.models import Site
 from django.core.signing import Signer, TimestampSigner
 from django.core.urlresolvers import reverse
@@ -11,7 +10,8 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
-# from message.models import Message
+
+from microsocial.settings import MEDIA_URL
 
 
 class UserManager(BaseUserManager):
@@ -37,7 +37,7 @@ class UserManager(BaseUserManager):
 
 def get_avatar_fn(instance, filename):
     id_str = str(instance.pk)
-    return  'avatars/{sub_dir}/{id}_{rand}{ext}'.format(
+    return 'avatars/{sub_dir}/{id}_{rand}{ext}'.format(
         sub_dir=id_str.zfill(2)[-2:],
         id=id_str,
         rand=get_random_string(8, 'abcdefghijklmnopqrstuvwxyz0123456789'),
@@ -72,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                                 'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     # friends = models.ManyToManyField('self', symmetrical=True, verbose_name=_(u'друзья'), blank=True)
-    # message = models.ForeignKey(Message, verbose_name=_(u'сообщения'), related_name='user')
+
 
     class Meta:
         verbose_name = _(u'контактное лицо')
@@ -93,6 +93,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.first_name
+
+    def get_avatar(self):
+        if self.avatar:
+            return self.avatar.url
+        return u'{}{}'.format(MEDIA_URL, 'img_default/avatar.jpg')
 
     def get_last_login_hash(self):
         return hashlib.md5(self.last_login.strftime('%Y-%m-%d-%H-%M-%S-%f')).hexdigest()[:8]
@@ -123,3 +128,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             ugettext(u'Для подтверждения перейдите по ссылке: {}'.format(url)),
             ugettext(u'Внимание данная ссылка будет действовать 48 часов')
         )
+
+
+class PostWall(models.Model):
+    wall_owner = models.ForeignKey(User, related_name='user_wall',)
+    author = models.ForeignKey(User, related_name='author_post',)
+    content = models.TextField(_(u'сообщения'), max_length=2000)
+    date_created = models.DateTimeField(_(u'час создания'), default=timezone.now)
