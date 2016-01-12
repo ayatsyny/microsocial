@@ -5,8 +5,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
-from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, MessageSendWallForm
-from users.models import User, PostWall
+from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, UserWallPostForm
+from users.models import User
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
@@ -15,31 +15,70 @@ class UserProfileView(TemplateView):
     template_name = 'users/profile.html'
 
     def dispatch(self, request, *args, **kwargs):
-        self.instance = get_object_or_404(User, pk=kwargs.get('user_id'))
-        self.qs = PostWall.objects.select_related('wall_owner', 'author').filter(wall_owner=self.instance.pk).order_by('-date_created',)
-        self.form = MessageSendWallForm(self.instance, request.user, request.POST or None)
-        paginator = Paginator(self.qs, 20)
-        page = request.GET.get('page')
-        try:
-            self.post_wall = paginator.page(page)
-        except PageNotAnInteger:
-            self.post_wall = paginator.page(1)
-        except EmptyPage:
-            self.post_wall = paginator.page(paginator.num_pages)
+        if request.user.is_authenticated() and request.user.pk == int(kwargs['user_id']):
+            self.user = request.user
+        else:
+            self.user = get_object_or_404(User, pk=kwargs['user_id'])
+        self.wall_post_form = UserWallPostForm(request.POST or None)
         return super(UserProfileView, self).dispatch(request, *args, **kwargs)
+
+    def get_wall_posts(self):
+        paginator = Paginator(self.user.wall_posts.select_related('author'), 2)
+        page = self.request.GET.get('page')
+        try:
+            wall_posts = paginator.page(page)
+        except PageNotAnInteger:
+            wall_posts = paginator.page(1)
+        except EmptyPage:
+            wall_posts = paginator.page(paginator.num_pages)
+        return wall_posts
 
     def get_context_data(self, **kwargs):
         context = super(UserProfileView, self).get_context_data(**kwargs)
-        context['user_profile'] = self.instance
-        context['post_wall'] = self.post_wall
-        context['form'] = self.form
+        context['profile_user'] = self.user
+        context['wall_posts'] = self.get_wall_posts()
+        context['wall_post_form'] = self.wall_post_form
         return context
 
     def post(self, request, *args, **kwargs):
-        if self.form.is_valid():
-            self.form.save()
+        if self.wall_post_form.is_valid():
+            post = self.wall_post_form.save(commit=False)
+            post.user = self.user
+            post.author = request.user
+            post.save()
+            messages.success(request, _(u'Сообщение успешно опубликовано.'))
             return redirect(request.path)
         return self.get(request, *args, **kwargs)
+
+
+
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     self.instance = get_object_or_404(User, pk=kwargs.get('user_id'))
+    #     self.qs = PostWall.objects.select_related('wall_owner', 'author').filter(wall_owner=self.instance.pk).order_by('-date_created',)
+    #     self.form = MessageSendWallForm(self.instance, request.user, request.POST or None)
+    #     paginator = Paginator(self.qs, 20)
+    #     page = request.GET.get('page')
+    #     try:
+    #         self.post_wall = paginator.page(page)
+    #     except PageNotAnInteger:
+    #         self.post_wall = paginator.page(1)
+    #     except EmptyPage:
+    #         self.post_wall = paginator.page(paginator.num_pages)
+    #     return super(UserProfileView, self).dispatch(request, *args, **kwargs)
+    #
+    # def get_context_data(self, **kwargs):
+    #     context = super(UserProfileView, self).get_context_data(**kwargs)
+    #     context['user_profile'] = self.instance
+    #     context['post_wall'] = self.post_wall
+    #     context['form'] = self.form
+    #     return context
+    #
+    # def post(self, request, *args, **kwargs):
+    #     if self.form.is_valid():
+    #         self.form.save()
+    #         return redirect(request.path)
+    #     return self.get(request, *args, **kwargs)
 
 
 class UserSettingsView(TemplateView):

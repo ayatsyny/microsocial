@@ -130,8 +130,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
 
-class PostWall(models.Model):
-    wall_owner = models.ForeignKey(User, related_name='user_wall',)
-    author = models.ForeignKey(User, related_name='author_post',)
-    content = models.TextField(_(u'сообщения'), max_length=2000)
-    date_created = models.DateTimeField(_(u'час создания'), default=timezone.now)
+class UserWallPost(models.Model):
+    user = models.ForeignKey(User, verbose_name=_(u'владелец стены'), related_name='wall_posts',)
+    author = models.ForeignKey(User, verbose_name=_(u'автор'), related_name='+',)
+    content = models.TextField(_(u'текст'), max_length=5000)
+    created = models.DateTimeField(_(u'дата'), auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ('-created',)

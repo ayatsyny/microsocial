@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load i18n microsocial tz humanize %}
+
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-sm-3">
+                <img class="img-responsive" src="{{ user_profile.get_avatar }}">
+         {% if user.pk == user_id|add:"0" %}
+            <br><a href={% url 'user_settings' %}>{% trans 'настройки'|capfirst %}</a>
+        {% else %}
+            <br><a href="#">{% trans 'добавить в друзья'|capfirst %}</a>
+            <br><a href="#">{% trans 'написать сообщение'|capfirst %}</a>
+        {% endif %}
+        </div>
+
+
+    <div class="col-sm-9">
+       <h2>{{ user_profile.get_full_name }}</h2>
+        <table class="table" align="left">
+            <tr>
+                <th>{% trans 'пол'|capfirst %}:</th>
+                <td>{{ user_profile.get_sex_display }}</td>
+            </tr>
+            <tr>
+                <th>{% trans 'дата рождения'|capfirst %}:</th>
+                <td>{{ user_profile.birth_date }}</td>
+            </tr>
+            <tr>
+                <th>{% trans 'город'|capfirst %}:</th>
+                <td>{{ user_profile.city }}</td>
+            </tr>
+            <tr>
+                <th>{% trans 'место роботы'|capfirst %}:</th>
+                <td>{{ user_profile.work_place }}</td>
+            </tr>
+            <tr>
+                <th>{% trans 'о себе'|capfirst %}:</th>
+                <td>{{ user_profile.about_me }}</td>
+            </tr>
+            <tr>
+                <th>{% trans 'интересы'|capfirst %}:</th>
+                <td>{{ user_profile.interests }}</td>
+            </tr>
+        </table>
+    </div>
+    <form class="form-horizontal" method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <label for="{{ field.id_for_label }}" class="control-label col-sm-3"></label>
+                <div class="col-sm-9">
+                    {{ field }}
+                </div>
+        {% endfor %}
+        <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <input type="submit" class="btn btn-primary" value="{% trans 'опубликовать'|capfirst %}">
+        </div>
+    </div>
+    </form>
+     <div class="col-sm-offset-3 col-sm-9">
+    <table class="text-left">
+
+                {% for field in post_wall %}
+                    <tr>
+                        <td rowspan="2"><img height="50" width="50" class="img-responsive" src="{{ field.author.get_avatar }}"></td>
+                        <td><a href={% url 'user_profile' field.author.pk %}>{{ field.author.get_full_name }}</a></td>
+                        <td>{{ field.date_created|naturaltime }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">{{ field.content }}</td>
+                    </tr>
+                {% endfor %}
+
+    </table>
+     </div>
+    </div>
+
+    {% if post_wall.has_other_pages %}
+<nav>
+<ul class="pagination">
+<li><a href="?page=1">&laquo;</a></li>
+{% for p in post_wall.paginator.page_range %}
+<li {% if post_wall.number == p %}class="active"{% endif %}>
+<a href="?page={{ p }}">{{ p }}</a>
+</li>
+{% endfor %}
+<li>
+<a href="?page={{ post_wall.paginator.num_pages }}">&laquo;</a>
+</li>
+</ul>
+</nav>
+{% endif %}
+
+
+{% endblock %}
