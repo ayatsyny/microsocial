@@ -12,6 +12,9 @@
             <div class="text-center" style="margin-top: 10px;">
                 {% if profile_user == user %}
                     <a href="{% url 'user_settings' %}">{% trans 'настройки'|capfirst %}</a>
+                    {% else %}
+                    <a href="#">{% trans 'Добавить в друзья' %}</a><br>
+                    <a href="#">{% trans 'Написать сообщение' %}</a>
                 {% endif %}
             </div>
         </div>

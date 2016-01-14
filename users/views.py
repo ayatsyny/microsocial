@@ -23,7 +23,7 @@ class UserProfileView(TemplateView):
         return super(UserProfileView, self).dispatch(request, *args, **kwargs)
 
     def get_wall_posts(self):
-        paginator = Paginator(self.user.wall_posts.select_related('author'), 2)
+        paginator = Paginator(self.user.wall_posts.select_related('author'), 20)
         page = self.request.GET.get('page')
         try:
             wall_posts = paginator.page(page)
@@ -49,36 +49,6 @@ class UserProfileView(TemplateView):
             messages.success(request, _(u'Сообщение успешно опубликовано.'))
             return redirect(request.path)
         return self.get(request, *args, **kwargs)
-
-
-
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     self.instance = get_object_or_404(User, pk=kwargs.get('user_id'))
-    #     self.qs = PostWall.objects.select_related('wall_owner', 'author').filter(wall_owner=self.instance.pk).order_by('-date_created',)
-    #     self.form = MessageSendWallForm(self.instance, request.user, request.POST or None)
-    #     paginator = Paginator(self.qs, 20)
-    #     page = request.GET.get('page')
-    #     try:
-    #         self.post_wall = paginator.page(page)
-    #     except PageNotAnInteger:
-    #         self.post_wall = paginator.page(1)
-    #     except EmptyPage:
-    #         self.post_wall = paginator.page(paginator.num_pages)
-    #     return super(UserProfileView, self).dispatch(request, *args, **kwargs)
-    #
-    # def get_context_data(self, **kwargs):
-    #     context = super(UserProfileView, self).get_context_data(**kwargs)
-    #     context['user_profile'] = self.instance
-    #     context['post_wall'] = self.post_wall
-    #     context['form'] = self.form
-    #     return context
-    #
-    # def post(self, request, *args, **kwargs):
-    #     if self.form.is_valid():
-    #         self.form.save()
-    #         return redirect(request.path)
-    #     return self.get(request, *args, **kwargs)
 
 
 class UserSettingsView(TemplateView):
