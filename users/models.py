@@ -14,6 +14,10 @@ from django.utils import timezone
 from microsocial.settings import MEDIA_URL
 
 
+def get_ids_from_users(*users):
+    return [user.pk if isinstance(user, User) else int(user) for user in users]
+
+
 class UserManager(BaseUserManager):
 
     def _create_user(self, email, password, is_staff, is_superuser, **extra_fields):
@@ -33,6 +37,36 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, True, True, **extra_fields)
+
+
+class UserFriendShipManager(models.Manager):
+    def are_friends(self, user1, user2):
+        user1_id, user2_id = get_ids_from_users(user1, user2)
+        return self.filter(pk=user1_id, friends__pk=user2_id).exists()
+
+    def add(self, user1, user2):
+        user1_id, user2_id = get_ids_from_users(user1, user2)
+        if user1_id == user2_id:
+            raise ValueError(_(u'Нельзя самого себе добавить в друзья'))
+        if not self.are_friends(user1_id, user2_id):
+            through_model = self.model.friends.through
+            through_model.objects.bulk_create([
+                through_model(from_user_id=user1_id, to_user_id=user2_id),
+                through_model(from_user_id=user2_id, to_user_id=user1_id),
+            ])
+            FriendInvite.objects.filter(
+                Q(from_user_id=user1_id, to_user_id=user2_id) | Q(from_user_id=user2_id, to_user_id=user1_id)
+            ).delete()
+            return True
+
+    def delete(self, user1, user2):
+        user1_id, user2_id = get_ids_from_users(user1, user2)
+        if self.are_friends(user1_id, user2_id):
+            through_model = self.model.friends.through
+            through_model.objects.filter(
+                Q(from_user_id=user1_id, to_user_id=user2_id) | Q(from_user_id=user2_id, to_user_id=user1_id)
+            ).delete()
+            return True
 
 
 def get_avatar_fn(instance, filename):
@@ -71,7 +105,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                     help_text=_('Designates whether this user should be treated as '
                                                 'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    relationships = models.ManyToManyField('self', symmetrical=True, verbose_name=_(u'друзья'), blank=True)
+    friends = models.ManyToManyField('self', symmetrical=True, verbose_name=_(u'друзья'), blank=True)
 
     class Meta:
         verbose_name = _(u'контактное лицо')
@@ -82,6 +116,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return u'{} {}'.format(self.first_name, self.last_name)
 
     objects = UserManager()
+    friendship = UserFriendShipManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name']
@@ -138,66 +173,43 @@ class UserWallPost(models.Model):
     class Meta:
         ordering = ('-created',)
 
-# class FriendsManager(models.Manager):
-#     def get_queryset(self, pk, active):
-#         return super(FriendsManager, self).get_queryset().filter(user=pk, is_active=active)
+
+class FriendInviteManager(models.Manager):
+    def is_pending(self, from_user, to_user):
+        from_user_id, to_user_id = get_ids_from_users(from_user, to_user)
+        return self.filter(from_user_id=from_user_id, to_user_id=to_user_id).exists()
+
+    def add(self, from_user, to_user):
+        from_user_id, to_user_id = get_ids_from_users(from_user, to_user)
+        if from_user_id == to_user_id:
+            raise ValueError(_(u'Нельзя самого себе добавить в друзья'))
+        if User.friendship.are_friends(from_user_id, to_user_id):
+            raise ValueError(_(u'Ви уже друзья.'))
+        if self.is_pending(from_user_id, to_user_id):
+            raise ValueError(_(u'Заявка уже создана и ожидает рассмотрения.'))
+        if self.is_pending(to_user_id, from_user_id):
+            User.friendship.add(from_user_id, to_user_id)
+            return 2
+        self.create(from_user_id=from_user_id, to_user_id=to_user_id)
+        return 1
+
+    def approve(self, from_user, to_user):
+        from_user_id, to_user_id = get_ids_from_users(from_user, to_user)
+        if not self.is_pending(from_user_id, to_user_id):
+            raise ValueError(_(u'Заявка не существует.'))
+        User.friendship.add(from_user, to_user)
+
+    def reject(self, from_user, to_user):
+        from_user_id, to_user_id = get_ids_from_users(from_user, to_user)
+        self.filter(from_user_id=from_user_id, to_user_id=to_user_id).delete()
 
 
-# class UserFriends(models.Model):
-#     from_user = models.ForeignKey(User, related_name='friends_from_user')
-#     to_user = models.ForeignKey(User, rel1ated_name='friends_to_user')
-#     is_active = models.BooleanField(_(u'active'), default=False)
-#
-#     class Meta:
-#         unique_together = ('from_user', 'to_user')
-#
-#
-# # UserFriends.objects.create()
-#
+class FriendInvite(models.Model):
+    from_user = models.ForeignKey(User, related_name='out_friend_invites')
+    to_user = models.ForeignKey(User, related_name='in_friend_invites')
 
-
-class FriendsManager(models.Manager):
-    def get_queryset(self):
-        return UserQuerySet(self.model, using=self._db)
-
-    def create_relationships(self, from_user):
-        instances = self.filter((Q(from_user=from_user) | Q(to_user=from_user)), active=Order.ACTIVE_ACTIVED)
-        # temp = []
-        if not instances:
-            return None
-        for instance in instances:
-            from_user.relationships.add(instance.to_user)
-            # temp.append(instance.to_user.pk)
-        if instances.exists():
-            instances.delete()
-            # self.filter((Q(from_user=from_user, to_user__pk__in=temp) | Q(from_user__pk__in=temp,
-            #                                             to_user=from_user)), active=Order.ACTIVE_NONE).delete()
-        return from_user
-
-
-class UserQuerySet(models.QuerySet):
-
-    def active_to_user(self, to_user, active=False):
-        return self.filter(active=active, to_user=to_user)
-
-    def active_from_user(self, from_user, active=False):
-        return self.filter(active=active, from_user=from_user)
-
-
-class Order(models.Model):
-    ACTIVE_NONE = 0
-    ACTIVE_ACTIVED = 1
-    ACTIVE_CHOICES = (
-        (ACTIVE_NONE, _(u'none')),
-        (ACTIVE_ACTIVED, _(u'потверджена заявка')),
-    )
-    active = models.PositiveSmallIntegerField(_(u'дружба'), choices=ACTIVE_CHOICES, default=ACTIVE_NONE)
-    from_user = models.ForeignKey(User, related_name='friends_from_user', blank=True)
-    to_user = models.ForeignKey(User, related_name='friends_to_user', blank=True)
-
-    my = FriendsManager()
-    mysq = UserQuerySet.as_manager()
-    objects = models.Manager()
+    objects = FriendInviteManager()
 
     class Meta:
         unique_together = ('from_user', 'to_user')
+
