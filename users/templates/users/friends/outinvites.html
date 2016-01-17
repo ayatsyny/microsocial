@@ -1,0 +1,38 @@
+{% extends 'users/friends/friends.html' %}
+{% load i18n users_to_teg %}
+
+
+{% block content %}
+
+    {% block menu %}
+        {{ block.super }}
+    {% endblock %}
+
+        {% for outinvite in friends %}
+            <div style="margin-top:  20px; border: 1px solid #666; padding: 10px;">
+                <div class="row text-left">pwd
+                        <form class="form" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="id_user" value="{{ outinvite.to_user_id }}">
+                    <div class="col-sm-2">
+                        <img class="img-responsive" src="{{ outinvite.to_user|get_avatar }}">
+                    </div>
+                    <div class="col-sm-9">
+                        <div>
+                            <a href="{% url 'user_profile' outinvite.to_user_id %}">
+                                <h3>{{ outinvite.to_user.get_full_name }}</h3>
+                            </a>
+                        </div>
+                          <input type="submit" name="reject" class="btn btn-link" value="{% trans 'отменить'|capfirst %}">
+                    </div>
+                        </form>
+                </div>
+            </div>
+        {% endfor %}
+
+    {% block page %}
+        {{ block.super }}
+    {% endblock %}
+
+
+{% endblock %}

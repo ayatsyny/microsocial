@@ -14,4 +14,23 @@ urlpatterns = [
         UserSettingsView.as_view(),
         name='user_settings'
     ),
+    url(
+        r'^friends/', include([
+            url(
+                r'^$',
+                views.FriendsView.as_view(),
+                name='friends'
+            ),
+            url(
+                r'^incoming/$',
+                views.InInvitesView.as_view(),
+                name='incoming'
+            ),
+            url(
+                r'^outcoming/$',
+                views.OutInvitesView.as_view(),
+                name='outcoming'
+            ),
+        ]),
+    ),
 ]

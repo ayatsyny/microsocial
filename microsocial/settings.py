@@ -70,6 +70,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
+    "users.context_processors.friend_menu",
 )
 
 ROOT_URLCONF = 'microsocial.urls'
@@ -124,6 +125,7 @@ AUTH_USER_MODEL = 'users.User'
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
     os.path.join(BASE_DIR, 'auths/templates'),
+    os.path.join(BASE_DIR, 'users/templates/friends/'),
 )
 
 LOGIN_URL = 'login'

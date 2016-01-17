@@ -54,7 +54,7 @@ class UserFriendShipManager(models.Manager):
                 through_model(from_user_id=user1_id, to_user_id=user2_id),
                 through_model(from_user_id=user2_id, to_user_id=user1_id),
             ])
-            FriendInvite.objects.filter(
+            FriendInvite.object.filter(
                 Q(from_user_id=user1_id, to_user_id=user2_id) | Q(from_user_id=user2_id, to_user_id=user1_id)
             ).delete()
             return True
@@ -208,7 +208,8 @@ class FriendInvite(models.Model):
     from_user = models.ForeignKey(User, related_name='out_friend_invites')
     to_user = models.ForeignKey(User, related_name='in_friend_invites')
 
-    objects = FriendInviteManager()
+    object = FriendInviteManager()
+    objects = UserManager()
 
     class Meta:
         unique_together = ('from_user', 'to_user')

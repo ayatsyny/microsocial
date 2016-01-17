@@ -1,22 +1,29 @@
 {% extends 'base.html' %}
 
-{% load i18n users humanize microsocial %}
+{% load i18n users_to_teg humanize microsocial %}
 
 
 {% block content %}
-    <div class="row">
+    <div class="row" xmlns="http://www.w3.org/1999/html">
         <div class="col-xs-3">
             <div style="margin-top: 20px;">
                 <img class="img-responsive" src="{{ profile_user|get_avatar }}">
             </div>
             <div class="text-center" style="margin-top: 10px;">
+              <form class="form" method="post">
+                {% csrf_token %}
                 {% if profile_user == user %}
                     <a href="{% url 'user_settings' %}">{% trans 'настройки'|capfirst %}</a>
-                    {% else %}
-                    <a href="#">{% trans 'Добавить в друзья' %}</a><br>
-                    <a href="#">{% trans 'Написать сообщение' %}</a>
+                {% elif profile_user.pk|are_friend:user.pk %}
+                     <input type="submit" name="del" class="btn btn-link" value="{% trans 'Удалить друзья' %}"><br>
+                    <input type="submit" class="btn btn-link" value="{% trans 'Написать сообщение' %}">
+                {% else %}
+                    <input type="submit" name="add" class="btn btn-link" value="{% trans 'Добавить в друзья' %}"><br>
+                    <input type="submit" class="btn btn-link" value="{% trans 'Написать сообщение' %}">
                 {% endif %}
+               </form>
             </div>
+
         </div>
         <div class="col-xs-9">
             <h1>{{ profile_user.get_full_name }}</h1>
