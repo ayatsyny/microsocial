@@ -11,7 +11,7 @@
           <ul class="nav navbar-nav">
             <li><a href="#">{% trans 'новости'|capfirst %}</a></li>
             <li><a href="{% url 'user_profile' user.pk %}">{% trans 'мой профиль'|capfirst %}</a></li>
-              <li><a href="{% url 'friends' %}">{% trans 'друзья'|capfirst %}</a></li>
+              <li><a href="{% url 'user_friends' %}">{% trans 'друзья'|capfirst %}</a></li>
               <li><a href="#">{% trans 'сообщения'|capfirst %}</a></li>
               <li><a href="#">{% trans 'поиск людей'|capfirst %}</a></li>
             <li><a href="{% url 'logout' %}">{% trans 'выход'|capfirst %}</a></li>

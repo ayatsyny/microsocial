@@ -18,19 +18,24 @@ urlpatterns = [
         r'^friends/', include([
             url(
                 r'^$',
-                views.FriendsView.as_view(),
-                name='friends'
+                views.UserFriendsView.as_view(),
+                name='user_friends'
             ),
             url(
                 r'^incoming/$',
-                views.InInvitesView.as_view(),
-                name='incoming'
+                views.UserIncomingView.as_view(),
+                name='user_incoming'
             ),
             url(
                 r'^outcoming/$',
-                views.OutInvitesView.as_view(),
-                name='outcoming'
+                views.UserOutcomingView.as_view(),
+                name='user_outcoming'
             ),
         ]),
+    ),
+    url(
+        r'^api/friendship/$',
+        views.FriendshipAPIView.as_view(),
+        name='user_friendship_api'
     ),
 ]

@@ -54,7 +54,7 @@ class UserFriendShipManager(models.Manager):
                 through_model(from_user_id=user1_id, to_user_id=user2_id),
                 through_model(from_user_id=user2_id, to_user_id=user1_id),
             ])
-            FriendInvite.object.filter(
+            FriendInvite.objects.filter(
                 Q(from_user_id=user1_id, to_user_id=user2_id) | Q(from_user_id=user2_id, to_user_id=user1_id)
             ).delete()
             return True
@@ -197,7 +197,7 @@ class FriendInviteManager(models.Manager):
         from_user_id, to_user_id = get_ids_from_users(from_user, to_user)
         if not self.is_pending(from_user_id, to_user_id):
             raise ValueError(_(u'Заявка не существует.'))
-        User.friendship.add(from_user, to_user)
+        return User.friendship.add(from_user, to_user)
 
     def reject(self, from_user, to_user):
         from_user_id, to_user_id = get_ids_from_users(from_user, to_user)
@@ -208,8 +208,7 @@ class FriendInvite(models.Model):
     from_user = models.ForeignKey(User, related_name='out_friend_invites')
     to_user = models.ForeignKey(User, related_name='in_friend_invites')
 
-    object = FriendInviteManager()
-    objects = UserManager()
+    objects = FriendInviteManager()
 
     class Meta:
         unique_together = ('from_user', 'to_user')

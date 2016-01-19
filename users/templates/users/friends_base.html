@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-3">
+            <ul class="nav nav-pills nav-stacked" style="margin-top: 20px;">
+                <li{% if friends_menu == 'friends' %} class="active"{% endif %}>
+                    <a href="{% url 'user_friends' %}">{% trans 'друзья'|capfirst %}</a>
+                </li>
+                 <li{% if friends_menu == 'incoming' %} class="active"{% endif %}>
+                    <a href="{% url 'user_incoming' %}">{% trans 'входяшие заявки'|capfirst %}</a>
+                </li>
+                <li{% if friends_menu == 'outcoming' %} class="active"{% endif %}>
+                    <a href="{% url 'user_outcoming' %}">{% trans 'исходящие заявки'|capfirst %}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-sm-9">
+            {% block friends_content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

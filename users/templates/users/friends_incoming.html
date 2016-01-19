@@ -1,0 +1,42 @@
+{% extends 'users/friends_base.html' %}
+
+{% load i18n users_to_teg microsocial %}
+
+{% block friends_content %}
+    <h1 xmlns="http://www.w3.org/1999/html">{% trans 'входяшие заявки'|capfirst %}</h1>
+
+    {% for item in items %}
+        <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
+            <div class="col-sm-2">
+                <img class="img-responsive" src="{{ item.from_user|get_avatar }}">
+            </div>
+            <div class="col-sm-9">
+                <h3 style="margin-top: 0;">
+                    <a href="{% url 'user_profile' item.from_user.pk %}">{{ item.from_user.get_full_name }}</a>
+                </h3>
+                <p>
+                    <form action="{% url 'user_friendship_api' %}" method="post" style="display: inline-block;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve">
+                        <input type="hidden" name="user_id" value="{{ item.from_user.pk }}">
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <input type="submit" class="btn btn-success btn-sm" value="{% trans 'подтвердить'|capfirst %}">
+                    </form>
+                    <form action="{% url 'user_friendship_api' %}" method="post" style="display: inline-block;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reject">
+                        <input type="hidden" name="user_id" value="{{ item.from_user.pk }}">
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <input type="submit" class="btn btn-danger btn-sm" value="{% trans 'отклонить'|capfirst %}">
+                    </form>
+
+                </p>
+
+            </div>
+        </div>
+
+    {% endfor %}
+
+    {% show_paginator items %}
+
+{% endblock %}
