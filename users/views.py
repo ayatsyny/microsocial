@@ -1,13 +1,16 @@
 # coding=utf-8
+import datetime
 from django.contrib.auth import BACKEND_SESSION_KEY, login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template.context import RequestContext
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, View
-from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, UserWallPostForm
+from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, UserWallPostForm, \
+    SearchUserForm
 from users.models import User, FriendInvite
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -59,25 +62,6 @@ class UserProfileView(TemplateView, MyPaginator):
         return context
 
     def post(self, request, *args, **kwargs):
-        # if 'del' in request.POST:
-        #     try:
-        #         User.friendship.delete(self.user, request.user)
-        #     except ValueError, e:
-        #         messages.warning(request, e)
-        #     else:
-        #         messages.success(request, _(u'Удаление друга успешно выполнено.'))
-        #     return redirect(request.path)
-        # if 'add' in request.POST:
-        #     try:
-        #         temp = FriendInvite.objects.add(request.user, self.user)
-        #     except ValueError, e:
-        #         messages.warning(request, e)
-        #     else:
-        #         if temp == 1:
-        #             messages.success(request, _(u' Заявка успешна создана.'))
-        #         elif temp == 2:
-        #             messages.success(request, _(u' Добавления друга успешно выполнено.'))
-        #     return redirect(request.path)
         if self.wall_post_form.is_valid():
             post = self.wall_post_form.save(commit=False)
             post.user = self.user
@@ -235,3 +219,37 @@ class FriendshipAPIView(View):
             messages.success(self.request, _(u'Заявка успешно отменена.'))
         return 'user_outcoming'
 
+
+class SearchUserView(TemplateView, MyPaginator):
+    template_name = 'users/search.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.search_form = SearchUserForm(request.GET or None)
+        return super(SearchUserView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(SearchUserView, self).get_context_data(**kwargs)
+        context['form'] = self.search_form
+        return context
+
+    def find(self):
+        kwargs = {}
+        for key, value in self.search_form.cleaned_data.items():
+            if key != 'birth_date' and key != 'birth_date_end' and value and key != 'sex':
+                kwargs['{}__contains'.format(key)] = value
+            elif key == 'birth_date':
+                print value, type(value)
+                kwargs['{}__gte'.format(key)] = datetime.date(value, 1, 1)
+            elif key == 'birth_date_end':
+                kwargs['birth_date__lte'] = datetime.date(value, 1, 1)
+            elif key == 'sex' and value:
+                kwargs[key] = value
+        return User.objects.filter(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if self.search_form.is_valid():
+            kwargs['items'] = self.get_paginator(self.find())
+        kwargs['context_instance'] = RequestContext(request)
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)

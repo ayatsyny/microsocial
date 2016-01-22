@@ -31,3 +31,4 @@ def show_paginator(page, page_arg_name='page'):
         'page': page,
         'page_arg_name': page_arg_name,
     }
+

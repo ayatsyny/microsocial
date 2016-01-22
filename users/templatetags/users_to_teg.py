@@ -1,4 +1,5 @@
 # coding=utf-8
+from django.utils import timezone
 from django import template
 from microsocial.settings import STATIC_URL
 
@@ -14,5 +15,12 @@ def get_avatar(user):
 
 
 @register.filter
-def are_friend(user1, user2):
-    return User.friendship.are_friends(user1, user2)
+def are_year_user(date):
+    return timezone.now().year - date.year
+
+
+@register.simple_tag
+def url_replace(request, field, value):
+    dict_ = request.GET.copy()
+    dict_[field] = value
+    return dict_.urlencode()

@@ -38,4 +38,9 @@ urlpatterns = [
         views.FriendshipAPIView.as_view(),
         name='user_friendship_api'
     ),
+    url(
+        r'^search/$',
+        views.SearchUserView.as_view(),
+        name='search_users'
+    ),
 ]

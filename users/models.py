@@ -212,4 +212,3 @@ class FriendInvite(models.Model):
 
     class Meta:
         unique_together = ('from_user', 'to_user')
-

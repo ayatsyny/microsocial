@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% load i18n microsocial users_to_teg %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-3">
+             <form class="form-horizontal" method="get">
+        {% for field in form %}
+                {% show_form_field_errors field.errors %}
+                <div class="form-group{% if field.errors %} has-error{% endif %}">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label|capfirst }}
+                </label>
+                <div>
+                    {{ field }}
+                </div>
+                </div>
+        {% endfor %}
+    <div class="form-group">
+        <div>
+            <input type="submit" class="btn btn-primary" value="{% trans 'искать'|capfirst %}">
+        </div>
+    </div>
+    </form>
+
+
+        </div>
+        <div class="col-sm-9">
+            <h1 class="text-center">{% trans 'поиск людей'|capfirst %}</h1>
+
+              {% for item in items %}
+            <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
+            <div class="col-sm-2">
+                <img class="img-responsive" src="{{ item|get_avatar }}">
+            </div>
+            <div class="col-sm-9">
+                <h3 style="margin-top: 0;">
+                    <a href="{% url 'user_profile' item.pk %}">{{ item.get_full_name }}</a>
+                </h3>
+                <p>
+                    {% if item.birth_date %}
+                        {{ item.birth_date|are_year_user }} {% trans 'лет' %}
+                    {% endif %}
+                </p>
+                <p>
+                    {% if item.city %}
+                        {{ item.city }}
+                    {% endif %}
+                </p>
+
+            </div>
+        </div>
+
+    {% endfor %}
+
+                {% if items.has_other_pages %}
+            <ul class="pager">
+                {% if items.has_previous %}
+                    <li class="previous">
+                     <a href="?{% url_replace request 'page' items.previous_page_number %}">
+                            &larr; {% trans 'новые'|capfirst %}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% if items.has_next %}
+                    <li class="next">
+                        <a href="?{% url_replace request 'page' items.next_page_number %}">
+                            {% trans 'старые'|capfirst %} &rarr;
+                        </a>
+                    </li>
+                {% endif %}
+                </ul>
+
+            {% endif %}
+
+
+        </div>
+    </div>
+{% endblock %}
