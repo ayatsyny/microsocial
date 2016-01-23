@@ -1,6 +1,8 @@
 # coding=utf-8
 import hashlib
 import os
+
+import datetime
 from django.contrib.sites.models import Site
 from django.core.signing import Signer, TimestampSigner
 from django.core.urlresolvers import reverse
@@ -162,6 +164,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             ugettext(u'Для подтверждения перейдите по ссылке: {}'.format(url)),
             ugettext(u'Внимание данная ссылка будет действовать 48 часов')
         )
+
+    def get_age(self):
+        if self.birth_date:
+            return int((datetime.date.today() - self.birth_date).days / 365.2425)
 
 
 class UserWallPost(models.Model):

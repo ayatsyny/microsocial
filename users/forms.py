@@ -78,37 +78,28 @@ class UserWallPostForm(forms.ModelForm, BootstrapFormMixin):
         return self.cleaned_data['content'].strip()
 
 
-class SearchUserForm(forms.Form, BootstrapFormMixin):
-    name = forms.CharField(label=_(u'имя ы фамилия'), required=False, max_length=70, widget=forms.TextInput(attrs={'placeholder': u'Имя, Фамилия'}))
-    sex = forms.TypedChoiceField(label=_(u'пол'), choices=[('0', u'все'), ('1', _(u'мужской')), ('2', _(u'женский'))], coerce=int, required=False)
-    birth_date = forms.IntegerField(label=_(u'год рождения'), min_value=1880, required=False)
-    birth_date_end = forms.IntegerField(label=_(u'год рождения'), min_value=1881, required=False)
-    city = forms.CharField(label=_(u'город'), max_length=80, required=False)
-    work_place = forms.CharField(label=_(u'место работы'), max_length=120, required=False)
-    about_me = forms.CharField(label=_(u'о себе'), max_length=1000, widget=forms.TextInput(attrs={'rows': 1}), required=False)
-    interests = forms.CharField(label=_(u'интересы'), max_length=1000, widget=forms.TextInput(attrs={'rows': 1}), required=False)
+class SearchForm(forms.Form, BootstrapFormMixin):
+    name = forms.CharField(label=_(u'имя, фамилия'), required=False,
+                           widget=forms.TextInput(attrs={'placeholder': _(u'Имя, Фамилия')}))
+    sex = forms.TypedChoiceField(label=_(u'пол'), choices=(('0', _(u'все')),) + User.SEX_CHOICES[1:],
+                                 coerce=lambda val: int(val), required=False)
+    by_from = forms.IntegerField(label=_(u'год рождения от'), required=False,
+                                    widget=forms.NumberInput(attrs={'placeholder': _(u'от')}))
+    by_to = forms.IntegerField(label=_(u'год рождения до'), required=False,
+                                        widget=forms.NumberInput(attrs={'placeholder': _(u'до')}))
+    city = forms.CharField(label=_(u'город'), required=False)
+    work_place = forms.CharField(label=_(u'место работы'), required=False)
+    about_me = forms.CharField(label=_(u'о себе'), required=False)
+    interests = forms.CharField(label=_(u'интересы'), required=False)
 
     def __init__(self, *args, **kwargs):
-        super(SearchUserForm, self).__init__(*args, **kwargs)
+        super(SearchForm, self).__init__(*args, **kwargs)
         BootstrapFormMixin.__init__(self)
 
-    def clean(self):
-        if self.cleaned_data['name']:
-            char = ' '
-            if self.cleaned_data['name'].find(',') != -1:
-                char = ','
-            temp = [item.strip() for item in self.cleaned_data['name'].strip().split(char)]
-            if len(temp) == 2:
-                self.cleaned_data['first_name'], self.cleaned_data['last_name'] = temp[:2]
-            elif len(temp) == 1:
-                if User.objects.filter(first_name__contains=temp[0]).exists():
-                    self.cleaned_data['first_name'] = temp[0]
-                elif User.objects.filter(last_name__contains=temp[0]).exists():
-                    self.cleaned_data['last_name'] = temp[0]
-                else:
-                    self.cleaned_data['first_name'] = temp[0]
-        for key, value in self.cleaned_data.items():
-            if not value or key == 'name':
-                del self.cleaned_data[key]
-        return self.cleaned_data
+    def get_values_list(self, field_name):
+        val = self.cleaned_data.get(field_name)
+        if isinstance(val, basestring):
+            val = val.strip().split()
+            return val or []
+
 

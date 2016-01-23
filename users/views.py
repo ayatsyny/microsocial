@@ -3,14 +3,14 @@ import datetime
 from django.contrib.auth import BACKEND_SESSION_KEY, login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.context import RequestContext
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, View
-from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, UserWallPostForm, \
-    SearchUserForm
+from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, UserWallPostForm, SearchForm
 from users.models import User, FriendInvite
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -21,12 +21,12 @@ class MyPaginator(View):
         paginator = Paginator(qs, 2)
         page = self.request.GET.get('page')
         try:
-            paginators = paginator.page(page)
+            items = paginator.page(page)
         except PageNotAnInteger:
-            paginators = paginator.page(1)
+            items = paginator.page(1)
         except EmptyPage:
-            paginators = paginator.page(paginator.num_pages)
-        return paginators
+            items = paginator.page(paginator.num_pages)
+        return items
 
 
 class UserProfileView(TemplateView, MyPaginator):
@@ -220,36 +220,58 @@ class FriendshipAPIView(View):
         return 'user_outcoming'
 
 
-class SearchUserView(TemplateView, MyPaginator):
+class SearchView(TemplateView):
     template_name = 'users/search.html'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        self.search_form = SearchUserForm(request.GET or None)
-        return super(SearchUserView, self).dispatch(request, *args, **kwargs)
+        self.form = SearchForm(request.GET or None)
+        return super(SearchView, self).dispatch(request, *args, **kwargs)
+
+    def get_filtered_qs(self, qs):
+        self.form.is_valid()
+        if not hasattr(self.form, 'cleaned_data'):
+            return qs
+        if self.form.cleaned_data.get('name'):
+            query = None
+            for val in self.form.get_values_list('name'):
+                q = Q(first_name__icontains=val) | Q(last_name__icontains=val)
+                if query is None:
+                    query = q
+                else:
+                    query |= q
+            if query:
+                qs = qs.filter(query)
+        if self.form.cleaned_data.get('sex'):
+            qs = qs.filter(sex=self.form.cleaned_data['sex'])
+        if self.form.cleaned_data.get('by_from'):
+            qs = qs.filter(birth_date__gte=datetime.datetime(self.form.cleaned_data['by_form'], 1, 1))
+        if self.form.cleaned_data.get('by_to'):
+            qs = qs.filter(birth_date__lt=datetime.datetime(self.form.cleaned_data['by_to'] + 1, 1, 1))
+        for field_name in ('city', 'work_place', 'about_me', 'interests'):
+            query = None
+            for val in self.form.get_values_list(field_name):
+                q = Q(**{'{}__icontains'.format(field_name): val})
+                if query is None:
+                    query = q
+                else:
+                    query |= q
+            if query:
+                qs = qs.filter(query)
+        return qs
 
     def get_context_data(self, **kwargs):
-        context = super(SearchUserView, self).get_context_data(**kwargs)
-        context['form'] = self.search_form
+        context = super(SearchView, self).get_context_data(**kwargs)
+        context['form'] = self.form
+        qs = self.get_filtered_qs(User.objects.all())
+        paginator = Paginator(qs, 2)
+        page = self.request.GET.get('page')
+        try:
+            items = paginator.page(page)
+        except PageNotAnInteger:
+            items = paginator.page(1)
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages)
+        context['items'] = items
         return context
 
-    def find(self):
-        kwargs = {}
-        for key, value in self.search_form.cleaned_data.items():
-            if key != 'birth_date' and key != 'birth_date_end' and value and key != 'sex':
-                kwargs['{}__contains'.format(key)] = value
-            elif key == 'birth_date':
-                print value, type(value)
-                kwargs['{}__gte'.format(key)] = datetime.date(value, 1, 1)
-            elif key == 'birth_date_end':
-                kwargs['birth_date__lte'] = datetime.date(value, 1, 1)
-            elif key == 'sex' and value:
-                kwargs[key] = value
-        return User.objects.filter(**kwargs)
-
-    def get(self, request, *args, **kwargs):
-        if self.search_form.is_valid():
-            kwargs['items'] = self.get_paginator(self.find())
-        kwargs['context_instance'] = RequestContext(request)
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context)
