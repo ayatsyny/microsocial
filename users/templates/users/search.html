@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% load i18n microsocial users_to_teg %}
+
+{% block content %}
+    <h1 class="text-center">{% trans 'поиск людей'|capfirst %}</h1>
+
+    <div class="row">
+        <div class="col-sm-5">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}" class="col-md-5 control-label">
+                        {{ form.name.label|capfirst }}
+                    </label>
+                    <div class="col-md-7">
+                        {{ form.name }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.sex.id_for_label }}" class="col-md-5 control-label">
+                        {{ form.sex.label|capfirst }}
+                    </label>
+                    <div class="col-md-7">
+                        {{ form.sex }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.by_from.id_for_label }}" class="col-md-5 control-label">
+                        {% trans 'год рождения'|capfirst %}:
+                    </label>
+                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                {{ form.by_from }}
+                            </div>
+                             <div class="col-xs-6">
+                                {{ form.by_to }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="form-group">
+                    <label for="{{ form.city.id_for_label }}" class="col-md-5 control-label">
+                        {{ form.city.label|capfirst }}
+                    </label>
+                    <div class="col-md-7">
+                        {{ form.city }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.work_place.id_for_label }}" class="col-md-5 control-label">
+                        {{ form.work_place.label|capfirst }}
+                    </label>
+                    <div class="col-md-7">
+                        {{ form.work_place }}
+                    </div>
+                </div>
+
+                 <div class="form-group">
+                    <label for="{{ form.about_me.id_for_label }}" class="col-md-5 control-label">
+                        {{ form.about_me.label|capfirst }}
+                    </label>
+                    <div class="col-md-7">
+                        {{ form.about_me }}
+                    </div>
+                </div>
+
+                 <div class="form-group">
+                    <label for="{{ form.interests.id_for_label }}" class="col-md-5 control-label">
+                        {{ form.interests.label|capfirst }}
+                    </label>
+                    <div class="col-md-7">
+                        {{ form.interests }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-5 col-md-7">
+                        <button type="submit" class="btn btn-primary">{% trans 'искать'|capfirst %}</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-sm-7">
+            {% for item in items %}
+                <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
+                    <div class="col-sm-2">
+                        <img class="img-responsive" src="{{ item|get_avatar }}">
+                    </div>
+                    <div class="col-sm-10">
+                        <h3 style="margin-top: 0;">
+                            <a href="{% url 'user_profile' item.pk %}">{{ item.get_full_name }}</a>
+                        </h3>
+                        {% with age=item.get_age %}
+                            {% if age %}
+                                <p>{% blocktrans %}{{ age }}лет{% endblocktrans %}</p>
+                            {% endif %}
+                        {% endwith %}
+                        {% if item.city %}
+                            <p>{{ item.city }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% endfor %}
+
+            {% show_paginator items %}
+
+        </div>
+    </div>
+
+{% endblock %}
