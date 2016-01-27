@@ -1,5 +1,6 @@
 # coding=utf-8
 import datetime
+from django.db.models import Count
 from django.contrib.auth import BACKEND_SESSION_KEY, login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -11,7 +12,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, View
 from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, UserWallPostForm, SearchForm
-from users.models import User, FriendInvite
+from users.models import User, FriendInvite, UserWallPost
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
@@ -245,7 +246,7 @@ class SearchView(TemplateView):
         if self.form.cleaned_data.get('sex'):
             qs = qs.filter(sex=self.form.cleaned_data['sex'])
         if self.form.cleaned_data.get('by_from'):
-            qs = qs.filter(birth_date__gte=datetime.datetime(self.form.cleaned_data['by_form'], 1, 1))
+            qs = qs.filter(birth_date__gte=datetime.datetime(self.form.cleaned_data['by_from'], 1, 1))
         if self.form.cleaned_data.get('by_to'):
             qs = qs.filter(birth_date__lt=datetime.datetime(self.form.cleaned_data['by_to'] + 1, 1, 1))
         for field_name in ('city', 'work_place', 'about_me', 'interests'):

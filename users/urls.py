@@ -43,4 +43,5 @@ urlpatterns = [
         views.SearchView.as_view(),
         name='user_search'
     ),
+
 ]

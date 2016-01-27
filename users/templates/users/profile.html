@@ -22,6 +22,11 @@
                     </form>
 {#                     <input type="submit" name="del" class="btn btn-link" value="{% trans 'Удалить друзья' %}"><br>#}
 {#                    <input type="submit" class="btn btn-link" value="{% trans 'Написать сообщение' %}">#}
+                    <div style="margin-top: 10px;">
+                        <a href="{% url 'messages' profile_user.pk %}">
+                            {% trans 'написать сообщение'|capfirst %}
+                        </a>
+                    </div>
                 {% else %}
                     <form action="{% url 'user_friendship_api' %}" method="post">
                         {% csrf_token %}
@@ -30,6 +35,11 @@
                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
                         <input type="submit" class="btn btn-success" value="{% trans 'добавить в друзья'|capfirst %}">
                     </form>
+                    <div style="margin-top: 10px;">
+                        <a href="{% url 'messages' profile_user.pk %}">
+                            {% trans 'написать сообщение'|capfirst %}
+                        </a>
+                    </div>
                 {% endif %}
             </div>
         </div>

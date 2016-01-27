@@ -172,7 +172,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class UserWallPost(models.Model):
     user = models.ForeignKey(User, verbose_name=_(u'владелец стены'), related_name='wall_posts',)
-    author = models.ForeignKey(User, verbose_name=_(u'автор'), related_name='+',)
+    author = models.ForeignKey(User, verbose_name=_(u'автор'), related_name='authors',)
     content = models.TextField(_(u'текст'), max_length=5000)
     created = models.DateTimeField(_(u'дата'), auto_now_add=True, db_index=True)
 
@@ -218,3 +218,4 @@ class FriendInvite(models.Model):
 
     class Meta:
         unique_together = ('from_user', 'to_user')
+

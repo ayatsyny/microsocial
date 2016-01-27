@@ -102,4 +102,3 @@ class SearchForm(forms.Form, BootstrapFormMixin):
             val = val.strip().split()
             return val or []
 
-

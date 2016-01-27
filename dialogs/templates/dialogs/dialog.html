@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% load i18n microsocial dialogs users_to_teg humanize %}
+
+{% block content %}
+    <div class="row">
+    <div class="col-sm-4">
+         <h1 style="margin-top: 0;">{% trans 'сообщения'|capfirst %}</h1>
+        {% for dialog in dialogs %}
+            {% get_opponent dialog as dialog_opponent %}
+            <div style="padding: 5px; {% if dialog_opponent == opponent %} background: #e1e9ff;{% endif %} ">
+                <a href="{% url 'user_profile' dialog_opponent.pk %}">
+                    <img class="img-responsive" width="60" style="display: inline-block;"
+                         src="{{ dialog_opponent|get_avatar }}"></a>
+                <a href="{% url 'messages' dialog_opponent.pk %}" style="font-size: 16px;">
+                    {{ dialog_opponent.get_full_name }}
+                </a>
+            </div>
+        {% endfor %}
+    {% show_paginator dialogs 'dialogs-page' %}
+    </div>
+
+    <div class="col-sm-8">
+    {% if opponent %}
+        <h4>
+            {% trans 'диалог с'|capfirst %}
+            <img class="img-responsive" width="30" style="display: inline-block;"
+                 src="{{ opponent|get_avatar }}">
+        <a href="{% url 'user_profile' opponent.pk %}">{{ opponent.get_full_name }}</a>
+        </h4>
+        <form class="form-horizontal" method="post">
+            {% csrf_token %}
+            {% show_form_field_errors form.text.errors 'col-xs-9' %}
+            <div class="form-group{% if form.text.errors %} has-error{% endif %}">
+                <div class="col-xs-9">
+                    {{ form.text }}
+                </div>
+                <div class="col-xs-3">
+                    <input type="submit" class="btn btn-primary" value="{% trans 'отправить'|capfirst %}">
+                </div>
+            </div>
+        </form>
+
+        {% for message in dialog_messages %}
+            <div style="margin-top: 20px;">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <img class="img-responsive" src="{{ message.sender|get_avatar }}">
+                    </div>
+                    <div class="col-sm-3">
+                        <a href="{% url 'user_profile' message.sender.pk %}">
+                            {{ message.sender.get_full_name }}
+                        </a>
+                        <br>
+                        <span title="{{ message.created }}"> {{ message.created|naturaltime }}</span>
+                    </div>
+                    <div class="col-sm-7">
+                        {{ message.text|linebreaksbr }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% show_paginator dialog_messages 'messages-page' %}
+    {% endif %}
+    </div>
+</div>
+{% endblock %}
