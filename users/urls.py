@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from users import views
 from users.views import UserSettingsView
 
@@ -43,5 +43,9 @@ urlpatterns = [
         views.SearchView.as_view(),
         name='user_search'
     ),
-
+    url(
+        r'^news/$',
+        views.NewsView.as_view(),
+        name='news'
+    ),
 ]

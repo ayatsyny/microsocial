@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% load i18n users_to_teg humanize microsocial %}
+
+{% block content %}
+     <h1 style="margin-top: 0;">{% trans 'новости'|capfirst %}</h1>
+     {% for item in items %}
+         <div style="border-top: 1px solid #666; padding: 10px 0;">
+
+          <img class="img-responsive" width="30" style="display: inline-block;"
+                         src="{{ item.user1|get_avatar }}">
+                  <a href="{% url 'user_profile' item.user1_id %}" style="font-size: 16px;">
+                    {{ item.user1.get_full_name }}
+                  </a>
+         {% if item.status == 0 %}
+             {% if item.user1 == item.user2 %}
+                 {% trans 'написал на своей стене' %}
+             {% else %}
+                 {% trans 'написал на стене' %}
+                    <img class="img-responsive" width="30" style="display: inline-block;"
+                         src="{{ item.user2|get_avatar }}">
+                  <a href="{% url 'user_profile' item.user2_id %}" style="font-size: 16px;">
+                    {{ item.user2.get_full_name }}
+                  </a>
+             {% endif %}
+                <span title="{{ item.created }}"> {{ item.created|naturaltime }}</span>
+                 <p>{{ item.user_post.content }}</p>
+
+         {% elif item.status == 1 %}
+                 {% trans 'и' %}
+                    <img class="img-responsive" width="30" style="display: inline-block;"
+                         src="{{ item.user2|get_avatar }}">
+                  <a href="{% url 'user_profile' item.user2_id %}" style="font-size: 16px;">
+                    {{ item.user2.get_full_name }}
+                  </a>
+             {% trans 'подружились' %}
+             <span title="{{ item.created }}"> {{ item.created|naturaltime }}</span>
+         {% elif item.status == 2 %}
+                 {% trans 'и' %}
+                    <img class="img-responsive" width="30" style="display: inline-block;"
+                         src="{{ item.user2|get_avatar }}">
+                  <a href="{% url 'user_profile' item.user2_id %}" style="font-size: 16px;">
+                    {{ item.user2.get_full_name }}
+                  </a>
+             {% trans 'разорвали дружбу' %}
+             <span title="{{ item.created }}"> {{ item.created|naturaltime }}</span>
+
+         {% endif %}
+     {% endfor %}
+
+    </div>
+
+        {% show_paginator items %}
+
+{% endblock %}

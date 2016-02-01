@@ -1,7 +1,6 @@
 # coding=utf-8
 import hashlib
 import os
-
 import datetime
 from django.contrib.sites.models import Site
 from django.core.signing import Signer, TimestampSigner
@@ -56,6 +55,7 @@ class UserFriendShipManager(models.Manager):
                 through_model(from_user_id=user1_id, to_user_id=user2_id),
                 through_model(from_user_id=user2_id, to_user_id=user1_id),
             ])
+            FriendInfo.friendinfom.add_info(user1_id, user2_id, FriendInfo.STATUS_FRIENDS)
             FriendInvite.objects.filter(
                 Q(from_user_id=user1_id, to_user_id=user2_id) | Q(from_user_id=user2_id, to_user_id=user1_id)
             ).delete()
@@ -64,6 +64,7 @@ class UserFriendShipManager(models.Manager):
     def delete(self, user1, user2):
         user1_id, user2_id = get_ids_from_users(user1, user2)
         if self.are_friends(user1_id, user2_id):
+            FriendInfo.friendinfom.add_info(user1_id, user2_id, FriendInfo.STATUS_NO_FRIENDS)
             through_model = self.model.friends.through
             through_model.objects.filter(
                 Q(from_user_id=user1_id, to_user_id=user2_id) | Q(from_user_id=user2_id, to_user_id=user1_id)
@@ -108,6 +109,10 @@ class User(AbstractBaseUser, PermissionsMixin):
                                                 'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     friends = models.ManyToManyField('self', symmetrical=True, verbose_name=_(u'друзья'), blank=True)
+    news = models.ManyToManyField('FriendInfo', through='UserWallNewsM2M', through_fields=('user', 'friendinfo'),
+                                  related_name='new_friends_and_you'
+                                  )
+    # news = models.ManyToManyField('FriendInfo',  related_name='news_friends_and_you')
 
     class Meta:
         verbose_name = _(u'контактное лицо')
@@ -218,4 +223,58 @@ class FriendInvite(models.Model):
 
     class Meta:
         unique_together = ('from_user', 'to_user')
+
+
+class FriendInfoManager(models.Manager):
+    def add_info(self, user1_id, user2_id, status):
+        temp = self.create(user1_id=user1_id, user2_id=user2_id, status=status)
+        FriendInfo.friendinfom.create_m2m(user1_id, user2_id, temp)
+
+    def add_post_wall(self, user1_id, user2_id, post):
+        temp = self.create(user1_id=user1_id, user2_id=user2_id, user_post=post)
+        if user1_id == user2_id:
+            UserWallNewsM2M.objects.create(user_id=user1_id, friendinfo_id=temp.pk)
+        elif not User.friendship.are_friends(user1_id, user2_id):
+            UserWallNewsM2M.objects.bulk_create([
+                    UserWallNewsM2M(user_id=user1_id, friendinfo_id=temp.pk),
+                    UserWallNewsM2M(user_id=user2_id, friendinfo_id=temp.pk),
+            ])
+        FriendInfo.friendinfom.create_m2m(user1_id, user2_id, temp)
+
+    def create_m2m(self, user1_id, user2_id, friends_info):
+        user1 = User.objects.get(pk=user1_id)
+        user2 = User.objects.get(pk=user2_id)
+        for pk in set(user1.friends.values_list('pk', flat=True)).union(user2.friends.values_list('pk', flat=True)):
+            UserWallNewsM2M.objects.create(user_id=pk, friendinfo_id=friends_info.pk)
+
+
+class FriendInfo(models.Model):
+    STATUS_NONE = 0
+    STATUS_FRIENDS = 1
+    STATUS_NO_FRIENDS = 2
+    STATUS_CHOICES = (
+        (STATUS_NONE, _('-------')),
+        (STATUS_FRIENDS, _(u'подружились')),
+        (STATUS_NO_FRIENDS, _(u'разорвали дружбу')),
+    )
+    user1 = models.ForeignKey(User, related_name='+')
+    user2 = models.ForeignKey(User, related_name='+')
+    status = models.SmallIntegerField(_(u'статус'), choices=STATUS_CHOICES, default=STATUS_NONE)
+    created = models.DateTimeField(_(u'дата'), auto_now_add=True, db_index=True)
+    user_post = models.ForeignKey(UserWallPost, related_name='+', null=True, blank=True)
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __unicode__(self):
+        return u'{} {}'.format(self.user1.get_full_name(), self.user2.get_full_name())
+
+    objects = UserManager()
+    friendinfom = FriendInfoManager()
+
+
+class UserWallNewsM2M(models.Model):
+    user = models.ForeignKey(User, related_name='+')
+    friendinfo = models.ForeignKey(FriendInfo, related_name='+')
+
 

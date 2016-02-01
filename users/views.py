@@ -1,25 +1,23 @@
 # coding=utf-8
 import datetime
-from django.db.models import Count
 from django.contrib.auth import BACKEND_SESSION_KEY, login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
-from django.template.context import RequestContext
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, View
 from users.forms import UserChangeProfileForm, UserPasswordChangeForm, UserEmailChangeForm, UserWallPostForm, SearchForm
-from users.models import User, FriendInvite, UserWallPost
+from users.models import User, FriendInvite, FriendInfo
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
 
 class MyPaginator(View):
     def get_paginator(self, qs):
-        paginator = Paginator(qs, 2)
+        paginator = Paginator(qs, 20)
         page = self.request.GET.get('page')
         try:
             items = paginator.page(page)
@@ -41,17 +39,6 @@ class UserProfileView(TemplateView, MyPaginator):
         self.wall_post_form = UserWallPostForm(request.POST or None)
         return super(UserProfileView, self).dispatch(request, *args, **kwargs)
 
-    # def get_wall_posts(self):
-    #     paginator = Paginator(self.user.wall_posts.select_related('author'), 1)
-    #     page = self.request.GET.get('page')
-    #     try:
-    #         wall_posts = paginator.page(page)
-    #     except PageNotAnInteger:
-    #         wall_posts = paginator.page(1)
-    #     except EmptyPage:
-    #         wall_posts = paginator.page(paginator.num_pages)
-    #     return wall_posts
-
     def get_context_data(self, **kwargs):
         context = super(UserProfileView, self).get_context_data(**kwargs)
         context['profile_user'] = self.user
@@ -68,6 +55,7 @@ class UserProfileView(TemplateView, MyPaginator):
             post.user = self.user
             post.author = request.user
             post.save()
+            FriendInfo.friendinfom.add_post_wall(post.author.pk, post.user.pk, post)
             messages.success(request, _(u'Сообщение успешно опубликовано.'))
             return redirect(request.path)
         return self.get(request, *args, **kwargs)
@@ -265,7 +253,7 @@ class SearchView(TemplateView):
         context = super(SearchView, self).get_context_data(**kwargs)
         context['form'] = self.form
         qs = self.get_filtered_qs(User.objects.all())
-        paginator = Paginator(qs, 2)
+        paginator = Paginator(qs, 20)
         page = self.request.GET.get('page')
         try:
             items = paginator.page(page)
@@ -276,3 +264,16 @@ class SearchView(TemplateView):
         context['items'] = items
         return context
 
+
+class NewsView(TemplateView, MyPaginator):
+    template_name = 'users/news.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.user = request.user
+        return super(NewsView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(NewsView, self).get_context_data(**kwargs)
+        context['items'] = self.get_paginator(self.user.news.all())
+        return context
