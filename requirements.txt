@@ -1,0 +1,8 @@
+pip
+setuptools
+pytz
+
+Django==1.7.8
+Pillow==2.7.0
+psycopg2==2.6.1
+uwsgi==2.0.10
