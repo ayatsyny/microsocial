@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 
@@ -68,4 +68,5 @@ class DialogView(TemplateView):
             message.dialog = self.dialog
             message.sender = request.user
             message.save()
+            return redirect(request.path)
         return self.get(request, *args, **kwargs)
